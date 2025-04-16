@@ -14,7 +14,6 @@
   
 // });
 
-
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -30,10 +29,15 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: Number(process.env.PORT) || 3000,
+    allowedHosts: [
+      "leadsourcing-frontend-production.up.railway.app",
+      "localhost",
+    ],
   },
   preview: {
     host: "0.0.0.0",
     port: Number(process.env.PORT) || 3000,
+    allowedHosts: true, // <- Change to boolean true instead of string "all"
   },
   build: {
     outDir: "dist",
