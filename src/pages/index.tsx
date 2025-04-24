@@ -16,7 +16,7 @@ interface ScrapeJob {
   result: [];
 }
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://leadsourcing-backend-production.up.railway.app";
 
 const convertToCSV = (data: any[]) => {
   if (data.length === 0) return "";
