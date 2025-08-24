@@ -16,7 +16,7 @@ import {
   Clock,
   Database,
   Phone,
-  Play,
+  // Play,
   CheckCircle,
   Star,
   ArrowRight,
@@ -188,14 +188,14 @@ const LandingPage = () => {
               >
                 Start Free Trial <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
+              {/* <Button
                 size="lg"
                 variant="outline"
                 className="border-white text-white hover:bg-white/10 px-8"
               >
                 <Play className="mr-2 h-5 w-5" />
                 Watch Demo
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
