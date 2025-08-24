@@ -26,7 +26,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   const handleStartTrial = () => {
-    navigate("/");
+    navigate("/login");
   };
 
   const features = [
