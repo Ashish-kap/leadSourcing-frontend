@@ -101,10 +101,13 @@ export const ExtractionsTable: React.FC = () => {
 
     console.log("🔌 Initializing Socket.IO connection...");
 
-    const newSocket = io("http://localhost:3000", {
-      auth: { token },
-      autoConnect: true,
-    });
+    const newSocket = io(
+      import.meta.env.VITE_BACKEND_HOST || "http://localhost:3000",
+      {
+        auth: { token },
+        autoConnect: true,
+      }
+    );
 
     // Connection event handlers
     newSocket.on("connect", () => {
