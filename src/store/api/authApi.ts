@@ -62,6 +62,24 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Auth", "User"],
     }),
 
+    googleAuth: builder.mutation<LoginResponse, { googleToken: string }>({
+      query: ({ googleToken }) => ({
+        url: "/users/auth/google/token",
+        method: "POST",
+        body: { authToken: googleToken },
+      }),
+      transformResponse: (response: LoginResponse) => {
+        if (response?.token) {
+          localStorage.setItem("authToken", response.token);
+          if (response.refresh) {
+            localStorage.setItem("refreshToken", response.token);
+          }
+        }
+        return response;
+      },
+      invalidatesTags: ["Auth"],
+    }),
+
     refreshToken: builder.mutation<{ access: string }, { token: string }>({
       query: (body) => ({
         url: "/token/refresh/",
@@ -87,6 +105,7 @@ export const {
   useLoginMutation,
   useSignupMutation,
   useLogoutMutation,
+  useGoogleAuthMutation,
   useRefreshTokenMutation,
   useGetCurrentUserQuery,
   useVerifyTokenQuery,

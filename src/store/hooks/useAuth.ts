@@ -5,6 +5,7 @@ import {
   useLogoutMutation,
   useGetCurrentUserQuery,
   useSignupMutation,
+  useGoogleAuthMutation,
 } from "./../../store/api/authApi";
 import { handleApiError } from "../utils/errorHandling";
 
@@ -13,6 +14,8 @@ export const useAuth = () => {
   const [loginMutation, { isLoading: isLoggingIn }] = useLoginMutation();
   const [signupMutation, { isLoading: isSigningUp }] = useSignupMutation();
   const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const [googleAuthMutation, { isLoading: isGoogleLoggingIn }] =
+    useGoogleAuthMutation();
 
   const token = localStorage.getItem("authToken");
 
@@ -71,14 +74,32 @@ export const useAuth = () => {
     }
   };
 
+  const googleAuth = async (googleToken: string) => {
+    try {
+      const result = await googleAuthMutation({ googleToken }).unwrap();
+      navigate("/");
+      return result;
+    } catch (error: any) {
+      handleApiError(error);
+      throw error;
+    }
+  };
+
   return {
     user,
     isAuthenticated,
-    isLoading: isLoadingUser || isLoggingIn || isLoggingOut || isSigningUp,
+    isLoading:
+      isLoadingUser ||
+      isLoggingIn ||
+      isLoggingOut ||
+      isSigningUp ||
+      isGoogleLoggingIn,
     login,
     logout,
+    googleAuth,
     isLoggingIn,
     isLoggingOut,
+    isGoogleLoggingIn,
     signup,
     isSigningUp,
   };
