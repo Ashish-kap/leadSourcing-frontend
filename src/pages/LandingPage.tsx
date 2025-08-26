@@ -92,7 +92,7 @@ const LandingPage = () => {
   const pricingPlans = [
     {
       name: "Starter",
-      price: "$29",
+      price: "$0",
       period: "/month",
       description: "Perfect for small businesses and freelancers",
       features: [
@@ -106,7 +106,7 @@ const LandingPage = () => {
     },
     {
       name: "Professional",
-      price: "$79",
+      price: "$9",
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
@@ -122,7 +122,7 @@ const LandingPage = () => {
     },
     {
       name: "Enterprise",
-      price: "$199",
+      price: "$49",
       period: "/month",
       description: "For large organizations and teams",
       features: [
@@ -307,6 +307,7 @@ const LandingPage = () => {
                       plan.popular ? "bg-primary" : ""
                     }`}
                     variant={plan.popular ? "default" : "outline"}
+                    onClick={handleStartTrial}
                   >
                     Get Started
                   </Button>
