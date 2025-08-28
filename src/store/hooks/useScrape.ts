@@ -61,13 +61,11 @@ export const useScrapeJob = () => {
       city: location.city,
       maxRecords: options?.maxRecords ?? 100,
       reviewTimeRange: options?.reviewTimeRange ?? null,
-      minRating: options?.minRating ?? null,
+      ratingFilter: options?.ratingFilter ?? undefined,
       reviewsWithinLastYears: options?.reviewsWithinLastYears ?? null,
     };
     return startScraping(scrapeRequest);
   };
-
-  
 
   return {
     // Scraping mutation

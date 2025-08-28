@@ -5,7 +5,10 @@ export interface scrapeJobPostRequest {
   city?: string;
   maxRecords: number | null;
   reviewTimeRange?: number | null;
-  minRating?: number | null;
+  ratingFilter?: {
+    operator: "gt" | "lt" | "gte" | "lte";
+    value: number;
+  };
   reviewsWithinLastYears?: number | null;
 }
 
@@ -13,7 +16,6 @@ export interface scrapeJobPostResponse {
   jobId: string;
   message: string;
 }
-
 
 //  Get api job
 

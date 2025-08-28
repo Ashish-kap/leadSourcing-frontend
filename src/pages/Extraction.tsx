@@ -48,7 +48,10 @@ export const Extraction: React.FC = () => {
     keyword: "",
     maxRecords: 50,
     reviewTimeRange: null as number | null,
-    minRating: null as number | null,
+    ratingFilter: {
+      operator: "gte" as "gt" | "lt" | "gte" | "lte",
+      value: null as number | null,
+    },
     reviewsWithinLastYears: null as number | null,
   });
 
@@ -101,6 +104,22 @@ export const Extraction: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
 
+    if (name === "ratingFilterValue") {
+      setFormData((prev) => ({
+        ...prev,
+        ratingFilter: {
+          ...prev.ratingFilter,
+          value:
+            value === "" || value === null || value === undefined
+              ? null
+              : isNaN(parseFloat(value))
+              ? null
+              : parseFloat(value),
+        },
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -111,6 +130,18 @@ export const Extraction: React.FC = () => {
             ? null
             : parseFloat(value)
           : value,
+    }));
+  };
+
+  const handleRatingOperatorChange = (
+    operator: "gt" | "lt" | "gte" | "lte"
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      ratingFilter: {
+        ...prev.ratingFilter,
+        operator,
+      },
     }));
   };
 
@@ -145,7 +176,13 @@ export const Extraction: React.FC = () => {
       city: location.city,
       maxRecords: formData.maxRecords,
       reviewTimeRange: formData.reviewTimeRange,
-      minRating: formData.minRating,
+      ratingFilter:
+        formData.ratingFilter.value !== null
+          ? {
+              operator: formData.ratingFilter.operator,
+              value: formData.ratingFilter.value,
+            }
+          : undefined,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
     };
 
@@ -167,13 +204,21 @@ export const Extraction: React.FC = () => {
         }
 
         // Optional numeric fields
-        if (
-          ["reviewTimeRange", "minRating", "reviewsWithinLastYears"].includes(
-            key
-          )
-        ) {
+        if (["reviewTimeRange", "reviewsWithinLastYears"].includes(key)) {
           return (
             value !== null && value !== undefined && !isNaN(value as number)
+          );
+        }
+
+        // Rating filter object
+        if (key === "ratingFilter") {
+          return (
+            value !== null &&
+            value !== undefined &&
+            typeof value === "object" &&
+            value.operator &&
+            value.value !== null &&
+            !isNaN(value.value)
           );
         }
 
@@ -194,7 +239,10 @@ export const Extraction: React.FC = () => {
       keyword: "",
       maxRecords: 50,
       reviewTimeRange: null,
-      minRating: null,
+      ratingFilter: {
+        operator: "gte" as "gt" | "lt" | "gte" | "lte",
+        value: null as number | null,
+      },
       reviewsWithinLastYears: null,
     });
     setLocation({
@@ -331,18 +379,40 @@ export const Extraction: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="minRating">Minimum Rating</Label>
-                      <Input
-                        id="minRating"
-                        name="minRating"
-                        type="number"
-                        value={formData.minRating || ""}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="5"
-                        step="0.1"
-                        placeholder="eg. 4.5"
-                      />
+                      <Label htmlFor="ratingOperator">Rating Filter</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select
+                          value={formData.ratingFilter.operator}
+                          onValueChange={handleRatingOperatorChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Operator" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gte">
+                              ≥ (Greater than or equal)
+                            </SelectItem>
+                            <SelectItem value="gt">
+                              &gt; (Greater than)
+                            </SelectItem>
+                            <SelectItem value="lte">
+                              ≤ (Less than or equal)
+                            </SelectItem>
+                            <SelectItem value="lt">&lt; (Less than)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          id="ratingFilterValue"
+                          name="ratingFilterValue"
+                          type="number"
+                          value={formData.ratingFilter.value || ""}
+                          onChange={handleInputChange}
+                          min="1"
+                          max="5"
+                          step="0.1"
+                          placeholder="eg. 4.5"
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
