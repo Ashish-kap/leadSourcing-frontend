@@ -9,6 +9,10 @@ export interface scrapeJobPostRequest {
     operator: "gt" | "lt" | "gte" | "lte";
     value: number;
   };
+  reviewFilter?: {
+    operator: "gt" | "lt" | "gte" | "lte";
+    value: number;
+  };
   reviewsWithinLastYears?: number | null;
 }
 

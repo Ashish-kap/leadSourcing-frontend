@@ -62,6 +62,7 @@ export const useScrapeJob = () => {
       maxRecords: options?.maxRecords ?? 100,
       reviewTimeRange: options?.reviewTimeRange ?? null,
       ratingFilter: options?.ratingFilter ?? undefined,
+      reviewFilter: options?.reviewFilter ?? undefined,
       reviewsWithinLastYears: options?.reviewsWithinLastYears ?? null,
     };
     return startScraping(scrapeRequest);
