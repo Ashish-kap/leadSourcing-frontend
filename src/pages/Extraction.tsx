@@ -52,6 +52,10 @@ export const Extraction: React.FC = () => {
       operator: "gte" as "gt" | "lt" | "gte" | "lte",
       value: null as number | null,
     },
+    reviewFilter: {
+      operator: "lte" as "gt" | "lt" | "gte" | "lte",
+      value: null as number | null,
+    },
     reviewsWithinLastYears: null as number | null,
   });
 
@@ -120,6 +124,22 @@ export const Extraction: React.FC = () => {
       return;
     }
 
+    if (name === "reviewFilterValue") {
+      setFormData((prev) => ({
+        ...prev,
+        reviewFilter: {
+          ...prev.reviewFilter,
+          value:
+            value === "" || value === null || value === undefined
+              ? null
+              : isNaN(parseFloat(value))
+              ? null
+              : parseFloat(value),
+        },
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -140,6 +160,18 @@ export const Extraction: React.FC = () => {
       ...prev,
       ratingFilter: {
         ...prev.ratingFilter,
+        operator,
+      },
+    }));
+  };
+
+  const handleReviewOperatorChange = (
+    operator: "gt" | "lt" | "gte" | "lte"
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      reviewFilter: {
+        ...prev.reviewFilter,
         operator,
       },
     }));
@@ -183,6 +215,13 @@ export const Extraction: React.FC = () => {
               value: formData.ratingFilter.value,
             }
           : undefined,
+      reviewFilter:
+        formData.reviewFilter.value !== null
+          ? {
+              operator: formData.reviewFilter.operator,
+              value: formData.reviewFilter.value,
+            }
+          : undefined,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
     };
 
@@ -222,6 +261,18 @@ export const Extraction: React.FC = () => {
           );
         }
 
+        // Review filter object
+        if (key === "reviewFilter") {
+          return (
+            value !== null &&
+            value !== undefined &&
+            typeof value === "object" &&
+            value.operator &&
+            value.value !== null &&
+            !isNaN(value.value)
+          );
+        }
+
         return false;
       })
     ) as scrapeJobPostRequest;
@@ -241,6 +292,10 @@ export const Extraction: React.FC = () => {
       reviewTimeRange: null,
       ratingFilter: {
         operator: "gte" as "gt" | "lt" | "gte" | "lte",
+        value: null as number | null,
+      },
+      reviewFilter: {
+        operator: "lte" as "gt" | "lt" | "gte" | "lte",
         value: null as number | null,
       },
       reviewsWithinLastYears: null,
@@ -379,6 +434,22 @@ export const Extraction: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="reviewTimeRange">
+                        Reviews Within Last (years)
+                      </Label>
+                      <Input
+                        id="reviewTimeRange"
+                        name="reviewTimeRange"
+                        type="number"
+                        value={formData.reviewTimeRange || ""}
+                        onChange={handleInputChange}
+                        min="1"
+                        max="30"
+                        placeholder="eg. 5"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="ratingOperator">Rating Filter</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <Select
@@ -416,19 +487,41 @@ export const Extraction: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="reviewTimeRange">
-                        Reviews Within Last (years)
+                      <Label htmlFor="reviewOperator">
+                        Review Count Filter
                       </Label>
-                      <Input
-                        id="reviewTimeRange"
-                        name="reviewTimeRange"
-                        type="number"
-                        value={formData.reviewTimeRange || ""}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="30"
-                        placeholder="eg. 5"
-                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select
+                          value={formData.reviewFilter.operator}
+                          onValueChange={handleReviewOperatorChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Operator" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gte">
+                              ≥ (Greater than or equal)
+                            </SelectItem>
+                            <SelectItem value="gt">
+                              &gt; (Greater than)
+                            </SelectItem>
+                            <SelectItem value="lte">
+                              ≤ (Less than or equal)
+                            </SelectItem>
+                            <SelectItem value="lt">&lt; (Less than)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          id="reviewFilterValue"
+                          name="reviewFilterValue"
+                          type="number"
+                          value={formData.reviewFilter.value || ""}
+                          onChange={handleInputChange}
+                          min="0"
+                          step="1"
+                          placeholder="eg. 100"
+                        />
+                      </div>
                     </div>
 
                     {/* <div className="space-y-2">
