@@ -30,6 +30,7 @@ export interface Job {
   status: string;
   progress: number;
   maxRecords: number;
+  recordsCollected?: number;
   createdAt: string;
   completedAt: string | null;
   duration: number | null;

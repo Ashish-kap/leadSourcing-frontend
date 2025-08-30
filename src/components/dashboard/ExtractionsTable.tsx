@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Loader2,
   Clock,
+  Trash2,
   // Pause,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,9 +52,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDownloadCsv } from "@/store/hooks/useDownloadCsv";
-import { useGetJobsQuery } from "@/store/api/scrapeJobApi";
+import {
+  useGetJobsQuery,
+  useDeleteJobMutation,
+} from "@/store/api/scrapeJobApi";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 
 interface Extraction {
   id: string;
@@ -62,6 +68,7 @@ interface Extraction {
   status: string;
   progress: number;
   maxRecords: number;
+  recordsCollected?: number;
   createdAt: string;
   completedAt: string | null;
   duration: number | null;
@@ -198,6 +205,8 @@ export const ExtractionsTable: React.FC = () => {
     refetch: refetchJobs, // ADD: refetch function
   } = useGetJobsQuery();
 
+  const [deleteJob, { isLoading: isDeletingJob }] = useDeleteJobMutation();
+
   // Debug: Log jobsData to see what's actually being received
   useEffect(() => {
     if (jobsData?.jobs) {
@@ -314,6 +323,16 @@ export const ExtractionsTable: React.FC = () => {
   // extract job list or empty
   const data: Extraction[] = useMemo(() => jobsData?.jobs ?? [], [jobsData]);
 
+  const handleDeleteJob = async (jobId: string, jobKeyword: string) => {
+    try {
+      await deleteJob(jobId).unwrap();
+      toast.success(`Successfully deleted extraction for "${jobKeyword}"`);
+    } catch (error: any) {
+      console.error("Delete job error:", error);
+      toast.error("Failed to delete extraction. Please try again.");
+    }
+  };
+
   const columns = useMemo<ColumnDef<Extraction>[]>(
     () => [
       {
@@ -345,43 +364,63 @@ export const ExtractionsTable: React.FC = () => {
           const jobId = row.original.id;
           const status = row.original.status;
           const maxRecords = row.original.maxRecords;
+          const recordsCollected = row.original.recordsCollected ?? 0;
           const originalProgress = getValue<number>();
-
-          // Use real-time progress if available, otherwise use original progress
-          const currentProgress =
-            realtimeProgress[jobId] ?? originalProgress ?? 0;
           const isActive = status === "active";
 
-          // Validate maxRecords and provide fallback
-          const validMaxRecords =
-            maxRecords && !isNaN(maxRecords) && maxRecords > 0
-              ? maxRecords
-              : null;
-          const validProgress =
-            !isNaN(currentProgress) && currentProgress >= 0
-              ? currentProgress
+          // Calculate progress based on job status
+          let displayProgress: number;
+          let recordsDisplay: string;
+
+          if (status === "active") {
+            // For active jobs, use real-time progress from socket or API
+            displayProgress = realtimeProgress[jobId] ?? originalProgress ?? 0;
+            const estimatedRecords = maxRecords
+              ? Math.floor((displayProgress / 100) * maxRecords)
               : 0;
-          const recordsProcessed = validMaxRecords
-            ? Math.floor((validProgress / 100) * validMaxRecords)
-            : 0;
+            recordsDisplay = maxRecords
+              ? `${estimatedRecords}/${maxRecords}`
+              : "Processing...";
+          } else {
+            // For completed/failed jobs, calculate based on actual records collected
+            if (maxRecords && maxRecords > 0) {
+              displayProgress = Math.min(
+                (recordsCollected / maxRecords) * 100,
+                100
+              );
+              recordsDisplay = `${recordsCollected}/${maxRecords}`;
+            } else {
+              displayProgress = recordsCollected > 0 ? 100 : 0;
+              recordsDisplay = `${recordsCollected}`;
+            }
+          }
 
           return (
             <div className="min-w-[120px] space-y-1">
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <Progress value={validProgress} className="h-2" />
+                  <Progress
+                    value={displayProgress}
+                    className={`h-2 ${
+                      status === "failed" ? "bg-destructive/20" : ""
+                    }`}
+                  />
                 </div>
                 {isActive && (
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 )}
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>
-                  {validMaxRecords
-                    ? `${recordsProcessed}/${validMaxRecords}`
-                    : "Processing..."}
+                <span>{recordsDisplay}</span>
+                <span
+                  className={
+                    status === "failed" && recordsCollected === 0
+                      ? "text-destructive"
+                      : ""
+                  }
+                >
+                  {Math.round(displayProgress)}%
                 </span>
-                <span>{Math.round(validProgress)}%</span>
               </div>
             </div>
           );
@@ -471,23 +510,47 @@ export const ExtractionsTable: React.FC = () => {
               {/* <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <Eye className="h-4 w-4" />
               </Button> */}
-              {extraction.progress === 100 && (
+              {extraction.status === "completed" &&
+                extraction.recordsCollected &&
+                extraction.recordsCollected > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      downloadCsv(
+                        row.original.id,
+                        `${row.original.keyword}-extraction.csv`
+                      )
+                    }
+                    disabled={isDownloading}
+                  >
+                    <Download
+                      className={`h-4 w-4 ${
+                        isDownloading ? "animate-spin" : ""
+                      }`}
+                    />
+                  </Button>
+                )}
+              <DeleteConfirmDialog
+                description={`This action cannot be undone. This will permanently delete the extraction for "${extraction.keyword}" and remove all associated data.`}
+                onConfirm={() =>
+                  handleDeleteJob(row.original.id, row.original.keyword)
+                }
+                isLoading={isDeletingJob}
+              >
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    downloadCsv(
-                      row.original.id,
-                      `${row.original.keyword}-extraction.csv`
-                    )
-                  }
-                  disabled={isDownloading}
+                  disabled={isDeletingJob}
+                  className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
                 >
-                  <Download
-                    className={`h-4 w-4 ${isDownloading ? "animate-spin" : ""}`}
-                  />
+                  {isDeletingJob ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </Button>
-              )}
+              </DeleteConfirmDialog>
               {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -497,7 +560,9 @@ export const ExtractionsTable: React.FC = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem>View Details</DropdownMenuItem>
-                  {extraction.progress === 100 && (
+                  {extraction.status === "completed" && 
+                   extraction.recordsCollected && 
+                   extraction.recordsCollected > 0 && (
                     <>
                       <DropdownMenuItem>Download CSV</DropdownMenuItem>
                       <DropdownMenuItem>Download Excel</DropdownMenuItem>
@@ -513,7 +578,7 @@ export const ExtractionsTable: React.FC = () => {
         },
       },
     ],
-    [realtimeProgress]
+    [realtimeProgress, handleDeleteJob, isDeletingJob]
   );
 
   const table = useReactTable({
