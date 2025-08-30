@@ -43,6 +43,17 @@ export const authApi = apiSlice.injectEndpoints({
         },
       }),
     }),
+
+    deleteJob: builder.mutation<{ message: string }, string>({
+      query: (jobId) => ({
+        url: `/delete/${jobId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_, __, jobId) => [
+        { type: "Jobs", id: jobId },
+        { type: "Jobs", id: "LIST" },
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -51,4 +62,5 @@ export const {
   useScrapeJobPostMutation,
   useGetJobsQuery,
   useLazyDownloadJobCsvQuery,
+  useDeleteJobMutation,
 } = authApi;
