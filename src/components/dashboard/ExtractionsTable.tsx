@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Clock,
   // Pause,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ interface Extraction {
   location: string;
   status: string;
   progress: number;
+  maxRecords: number;
   createdAt: string;
   completedAt: string | null;
   duration: number | null;
@@ -72,6 +74,112 @@ const statusColors: Record<string, string> = {
   waiting: "bg-warning text-warning-foreground",
   delayed: "bg-warning text-warning-foreground",
   pause: "bg-warning text-warning-foreground",
+};
+
+// Function to calculate estimated completion time
+const calculateEstimatedTime = (
+  progress: number,
+  maxRecords: number | null | undefined,
+  createdAt: string,
+  status: string
+): { estimatedTime: string; remainingTime: string } => {
+  // Validate maxRecords and provide fallback
+  const validMaxRecords =
+    maxRecords && !isNaN(maxRecords) && maxRecords > 0 ? maxRecords : 100;
+
+  // If maxRecords is invalid or missing, return generic estimate
+  if (!maxRecords || isNaN(maxRecords) || maxRecords <= 0) {
+    if (status === "active") {
+      return {
+        estimatedTime: "Calculating...",
+        remainingTime: "Calculating...",
+      };
+    }
+    return { estimatedTime: "Unknown", remainingTime: "-" };
+  }
+
+  // If completed, no estimation needed
+  if (status === "completed") {
+    return { estimatedTime: "Completed", remainingTime: "0m" };
+  }
+
+  // If failed or paused, show status
+  if (status === "failed") {
+    return { estimatedTime: "Failed", remainingTime: "-" };
+  }
+
+  if (status === "pause" || status === "waiting" || status === "delayed") {
+    return { estimatedTime: "Paused", remainingTime: "-" };
+  }
+
+  // Calculate elapsed time
+  const startTime = new Date(createdAt).getTime();
+  const currentTime = new Date().getTime();
+  const elapsedMinutes = (currentTime - startTime) / (1000 * 60);
+
+  // Validate progress
+  const validProgress = !isNaN(progress) && progress >= 0 ? progress : 0;
+
+  // If no progress yet, use default estimate
+  if (validProgress <= 0) {
+    const minTime = Math.ceil(validMaxRecords * 0.4); // 0.4 minutes per record (min)
+    const maxTime = Math.ceil(validMaxRecords * 1.0); // 1.0 minutes per record (max)
+    return {
+      estimatedTime: `${minTime}-${maxTime}m`,
+      remainingTime: `${minTime}-${maxTime}m`,
+    };
+  }
+
+  // Calculate rate based on current progress
+  const recordsProcessed = Math.floor((validProgress / 100) * validMaxRecords);
+  const remainingRecords = validMaxRecords - recordsProcessed;
+
+  if (recordsProcessed > 0 && elapsedMinutes > 0) {
+    // Calculate rate from actual performance
+    const ratePerMinute = recordsProcessed / elapsedMinutes;
+    const estimatedRemainingMinutes = Math.ceil(
+      remainingRecords / ratePerMinute
+    );
+
+    return {
+      estimatedTime: formatTime(estimatedRemainingMinutes + elapsedMinutes),
+      remainingTime: formatTime(estimatedRemainingMinutes),
+    };
+  }
+
+  // Fallback to default calculation
+  const avgTimePerRecord = 0.7; // Average of 0.4-1.0 minutes
+  const remainingMinutes = Math.ceil(remainingRecords * avgTimePerRecord);
+
+  return {
+    estimatedTime: formatTime(remainingMinutes + elapsedMinutes),
+    remainingTime: formatTime(remainingMinutes),
+  };
+};
+
+// Helper function to format time in a readable way
+const formatTime = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (hours < 24) {
+    return remainingMinutes > 0
+      ? `${hours}h ${remainingMinutes}m`
+      : `${hours}h`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+
+  if (remainingHours > 0) {
+    return `${days}d ${remainingHours}h`;
+  }
+
+  return `${days}d`;
 };
 
 export const ExtractionsTable: React.FC = () => {
@@ -90,6 +198,21 @@ export const ExtractionsTable: React.FC = () => {
     refetch: refetchJobs, // ADD: refetch function
   } = useGetJobsQuery();
 
+  // Debug: Log jobsData to see what's actually being received
+  useEffect(() => {
+    if (jobsData?.jobs) {
+      console.log("Jobs data received:", jobsData.jobs);
+      jobsData.jobs.forEach((job, index) => {
+        console.log(`Job ${index}:`, {
+          id: job.id,
+          maxRecords: job.maxRecords,
+          progress: job.progress,
+          status: job.status,
+        });
+      });
+    }
+  }, [jobsData]);
+
   // FIXED: Proper Socket.IO connection management
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -101,13 +224,10 @@ export const ExtractionsTable: React.FC = () => {
 
     console.log("🔌 Initializing Socket.IO connection...");
 
-    const newSocket = io(
-      import.meta.env.VITE_BACKEND_HOST,
-      {
-        auth: { token },
-        autoConnect: true,
-      }
-    );
+    const newSocket = io(import.meta.env.VITE_BACKEND_HOST, {
+      auth: { token },
+      autoConnect: true,
+    });
 
     // Connection event handlers
     newSocket.on("connect", () => {
@@ -224,25 +344,102 @@ export const ExtractionsTable: React.FC = () => {
         cell: ({ getValue, row }) => {
           const jobId = row.original.id;
           const status = row.original.status;
+          const maxRecords = row.original.maxRecords;
           const originalProgress = getValue<number>();
 
           // Use real-time progress if available, otherwise use original progress
-          const currentProgress = realtimeProgress[jobId] ?? originalProgress;
+          const currentProgress =
+            realtimeProgress[jobId] ?? originalProgress ?? 0;
           const isActive = status === "active";
+
+          // Validate maxRecords and provide fallback
+          const validMaxRecords =
+            maxRecords && !isNaN(maxRecords) && maxRecords > 0
+              ? maxRecords
+              : null;
+          const validProgress =
+            !isNaN(currentProgress) && currentProgress >= 0
+              ? currentProgress
+              : 0;
+          const recordsProcessed = validMaxRecords
+            ? Math.floor((validProgress / 100) * validMaxRecords)
+            : 0;
 
           return (
             <div className="min-w-[120px] space-y-1">
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <Progress value={currentProgress} className="h-2" />
+                  <Progress value={validProgress} className="h-2" />
                 </div>
                 {isActive && (
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 )}
               </div>
-              <div className="text-xs text-right text-muted-foreground">
-                {Math.round(currentProgress)}%
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>
+                  {validMaxRecords
+                    ? `${recordsProcessed}/${validMaxRecords}`
+                    : "Processing..."}
+                </span>
+                <span>{Math.round(validProgress)}%</span>
               </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "estimatedTime",
+        header: "Est. Completion",
+        cell: ({ row }) => {
+          const jobId = row.original.id;
+          const status = row.original.status;
+          const maxRecords = row.original.maxRecords;
+          const createdAt = row.original.createdAt;
+          const originalProgress = row.original.progress;
+
+          // Use real-time progress if available, otherwise use original progress
+          const currentProgress =
+            realtimeProgress[jobId] ?? originalProgress ?? 0;
+
+          const { estimatedTime, remainingTime } = calculateEstimatedTime(
+            currentProgress,
+            maxRecords,
+            createdAt,
+            status
+          );
+
+          // Validate maxRecords for display
+          // const validMaxRecords =
+          //   maxRecords && !isNaN(maxRecords) && maxRecords > 0
+          //     ? maxRecords
+          //     : null;
+          // const validProgress =
+          //   !isNaN(currentProgress) && currentProgress >= 0
+          //     ? currentProgress
+          //     : 0;
+          // const recordsProcessed = validMaxRecords
+          //   ? Math.floor((validProgress / 100) * validMaxRecords)
+          //   : 0;
+
+          return (
+            <div className="min-w-[140px] space-y-1">
+              {/* <div className="text-xs text-muted-foreground">
+                {validMaxRecords
+                  ? `${recordsProcessed}/${validMaxRecords} records`
+                  : "Processing..."}
+              </div> */}
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3 text-muted-foreground" />
+                <div className="text-sm font-medium">
+                  {status === "active" ? remainingTime : estimatedTime}
+                </div>
+              </div>
+              {status === "active" && (
+                <div className="text-xs text-muted-foreground">remaining</div>
+              )}
+              {/* {status === "completed" && (
+                <div className="text-xs text-green-600">Done</div>
+              )} */}
             </div>
           );
         },

@@ -28,13 +28,18 @@ export const useAuth = () => {
   });
 
   const isAuthenticated = useMemo(() => {
+    // If we have a token but user is still loading, consider as authenticated
+    // This prevents race condition during login
+    if (token && isLoadingUser) {
+      return true;
+    }
     return Boolean(token && user && !userError);
-  }, [token, user, userError]);
+  }, [token, user, userError, isLoadingUser]);
 
   const login = async (emailID: string, password: string) => {
     try {
       const result = await loginMutation({ emailID, password }).unwrap();
-      navigate("/");
+      navigate("/", { replace: true });
       return result;
     } catch (error: any) {
       handleApiError(error);
@@ -55,7 +60,7 @@ export const useAuth = () => {
         password,
         passwordConfirm,
       }).unwrap();
-      navigate("/");
+      navigate("/", { replace: true });
       return result;
     } catch (error: any) {
       handleApiError(error);
@@ -77,7 +82,7 @@ export const useAuth = () => {
   const googleAuth = async (googleToken: string) => {
     try {
       const result = await googleAuthMutation({ googleToken }).unwrap();
-      navigate("/");
+      navigate("/", { replace: true });
       return result;
     } catch (error: any) {
       handleApiError(error);

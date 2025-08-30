@@ -22,7 +22,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, RotateCcw } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Loader2, RotateCcw, HelpCircle } from "lucide-react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
@@ -309,95 +315,138 @@ export const Extraction: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <Sidebar
-        isCollapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+    <TooltipProvider>
+      <div className="flex h-screen bg-background overflow-hidden">
+        <Sidebar
+          isCollapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header />
 
-        <main className="flex-1 overflow-auto p-4 sm:p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Breadcrumb */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <span>Dashboard</span>
-              <span>/</span>
-              <span className="text-foreground">New Extraction</span>
-            </div>
+          <main className="flex-1 overflow-auto p-4 sm:p-6">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Breadcrumb */}
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <span>Dashboard</span>
+                <span>/</span>
+                <span className="text-foreground">New Extraction</span>
+              </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Google Maps Scraper</CardTitle>
-                <CardDescription>
-                  Enter your search criteria to scrape business data from Google
-                  Maps
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Keyword Input */}
-                  <div className="space-y-2">
-                    <Label htmlFor="keyword">Search Keyword *</Label>
-                    <Input
-                      id="keyword"
-                      name="keyword"
-                      value={formData.keyword}
-                      onChange={handleInputChange}
-                      placeholder="e.g., coffee shops, restaurants, hotels"
-                      required
-                    />
-                  </div>
-
-                  {/* Location Selection */}
-                  <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    Google Maps Scraper
+                  </CardTitle>
+                  <CardDescription>
+                    Enter your search criteria to scrape business data from
+                    Google Maps
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Keyword Input */}
                     <div className="space-y-2">
-                      <Label htmlFor="country">Country *</Label>
-                      <Select
-                        value={location.countryCode}
-                        onValueChange={handleCountryChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem
-                              key={country.isoCode}
-                              value={country.isoCode}
-                            >
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="keyword">Search Keyword *</Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Enter the type of business or service you want to
+                              find (e.g., 'restaurants', 'hotels', 'coffee
+                              shops')
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input
+                        id="keyword"
+                        name="keyword"
+                        value={formData.keyword}
+                        onChange={handleInputChange}
+                        placeholder="e.g., coffee shops, restaurants, hotels"
+                        required
+                      />
                     </div>
 
-                    <div className="space-y-2 ">
-                      <Label htmlFor="state">State/Province</Label>
-                      <Select
-                        value={location.stateCode}
-                        onValueChange={handleStateChange}
-                        disabled={!location.countryCode}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select state" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {states.map((state) => (
-                            <SelectItem
-                              key={state.isoCode}
-                              value={state.isoCode}
-                            >
-                              {state.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {/* Location Selection */}
+                    <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="country">Country *</Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Select the country where you want to search for
+                                businesses
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <Select
+                          value={location.countryCode}
+                          onValueChange={handleCountryChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {countries.map((country) => (
+                              <SelectItem
+                                key={country.isoCode}
+                                value={country.isoCode}
+                              >
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                    {/* <div className="space-y-2">
+                      <div className="space-y-2 ">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="state">State/Province</Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Optional: Select a specific state or province to
+                                narrow down your search
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <Select
+                          value={location.stateCode}
+                          onValueChange={handleStateChange}
+                          disabled={!location.countryCode}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select state" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {states.map((state) => (
+                              <SelectItem
+                                key={state.isoCode}
+                                value={state.isoCode}
+                              >
+                                {state.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* <div className="space-y-2">
                       <Label htmlFor="city">City *</Label>
                       <Select
                         value={location.city}
@@ -416,115 +465,174 @@ export const Extraction: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </div> */}
-                  </div>
-
-                  {/* Advanced Options */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="maxRecords">Max Records</Label>
-                      <Input
-                        id="maxRecords"
-                        name="maxRecords"
-                        type="number"
-                        value={formData.maxRecords}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="1000"
-                      />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="reviewTimeRange">
-                        Reviews Within Last (years)
-                      </Label>
-                      <Input
-                        id="reviewTimeRange"
-                        name="reviewTimeRange"
-                        type="number"
-                        value={formData.reviewTimeRange || ""}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="30"
-                        placeholder="eg. 5"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="ratingOperator">Rating Filter</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Select
-                          value={formData.ratingFilter.operator}
-                          onValueChange={handleRatingOperatorChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Operator" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="gte">
-                              ≥ (Greater than or equal)
-                            </SelectItem>
-                            <SelectItem value="gt">
-                              &gt; (Greater than)
-                            </SelectItem>
-                            <SelectItem value="lte">
-                              ≤ (Less than or equal)
-                            </SelectItem>
-                            <SelectItem value="lt">&lt; (Less than)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    {/* Advanced Options */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="maxRecords">Number of businesses ?</Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Maximum number of business records to extract
+                                (1-1000). Higher numbers take longer to process.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                         <Input
-                          id="ratingFilterValue"
-                          name="ratingFilterValue"
+                          id="maxRecords"
+                          name="maxRecords"
                           type="number"
-                          value={formData.ratingFilter.value || ""}
+                          value={formData.maxRecords}
                           onChange={handleInputChange}
                           min="1"
-                          max="5"
-                          step="0.1"
-                          placeholder="eg. 4.5"
+                          max="1000"
                         />
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="reviewOperator">
-                        Review Count Filter
-                      </Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Select
-                          value={formData.reviewFilter.operator}
-                          onValueChange={handleReviewOperatorChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Operator" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="gte">
-                              ≥ (Greater than or equal)
-                            </SelectItem>
-                            <SelectItem value="gt">
-                              &gt; (Greater than)
-                            </SelectItem>
-                            <SelectItem value="lte">
-                              ≤ (Less than or equal)
-                            </SelectItem>
-                            <SelectItem value="lt">&lt; (Less than)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="reviewTimeRange">
+                            Reviews Within Last (years)
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Optional: Only include businesses with reviews
+                                posted within the last X years. Leave empty for
+                                all reviews.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                         <Input
-                          id="reviewFilterValue"
-                          name="reviewFilterValue"
+                          id="reviewTimeRange"
+                          name="reviewTimeRange"
                           type="number"
-                          value={formData.reviewFilter.value || ""}
+                          value={formData.reviewTimeRange || ""}
                           onChange={handleInputChange}
-                          min="0"
-                          step="1"
-                          placeholder="eg. 100"
+                          min="1"
+                          max="30"
+                          placeholder="eg. 5"
                         />
                       </div>
-                    </div>
 
-                    {/* <div className="space-y-2">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="ratingOperator">Rating Filter</Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Optional: Filter businesses by their average
+                                rating (1-5 stars). Choose operator and value
+                                (e.g., '≥ 4.0' for 4+ stars).
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={formData.ratingFilter.operator}
+                            onValueChange={handleRatingOperatorChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Operator" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gte">
+                                ≥ (Greater than or equal)
+                              </SelectItem>
+                              <SelectItem value="gt">
+                                &gt; (Greater than)
+                              </SelectItem>
+                              <SelectItem value="lte">
+                                ≤ (Less than or equal)
+                              </SelectItem>
+                              <SelectItem value="lt">
+                                &lt; (Less than)
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            id="ratingFilterValue"
+                            name="ratingFilterValue"
+                            type="number"
+                            value={formData.ratingFilter.value || ""}
+                            onChange={handleInputChange}
+                            min="1"
+                            max="5"
+                            step="0.1"
+                            placeholder="eg. 4.5"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="reviewOperator">
+                            Review Count Filter
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Optional: Filter businesses by their total
+                                number of reviews. Choose operator and value
+                                (e.g., '≥ 50' for businesses with 50+ reviews).
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={formData.reviewFilter.operator}
+                            onValueChange={handleReviewOperatorChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Operator" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gte">
+                                ≥ (Greater than or equal)
+                              </SelectItem>
+                              <SelectItem value="gt">
+                                &gt; (Greater than)
+                              </SelectItem>
+                              <SelectItem value="lte">
+                                ≤ (Less than or equal)
+                              </SelectItem>
+                              <SelectItem value="lt">
+                                &lt; (Less than)
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            id="reviewFilterValue"
+                            name="reviewFilterValue"
+                            type="number"
+                            value={formData.reviewFilter.value || ""}
+                            onChange={handleInputChange}
+                            min="0"
+                            step="1"
+                            placeholder="eg. 100"
+                          />
+                        </div>
+                      </div>
+
+                      {/* <div className="space-y-2">
                       <Label htmlFor="reviewsWithinLastYears">
                         Reviews Within Last (years)
                       </Label>
@@ -538,90 +646,90 @@ export const Extraction: React.FC = () => {
                         max="10"
                       />
                     </div> */}
-                  </div>
+                    </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      type="submit"
-                      disabled={isScraping}
-                      className="flex-1"
-                    >
-                      {isScraping ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Scraping...
-                        </>
-                      ) : (
-                        "Start Scraping"
-                      )}
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        type="submit"
+                        disabled={isScraping}
+                        className="flex-1"
+                      >
+                        {isScraping ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Scraping...
+                          </>
+                        ) : (
+                          "Start Scraping"
+                        )}
+                      </Button>
 
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleReset}
-                    >
-                      <RotateCcw className="mr-2 h-4 w-4" />
-                      Reset
-                    </Button>
-                  </div>
-                </form>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleReset}
+                      >
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Reset
+                      </Button>
+                    </div>
+                  </form>
 
-                {/* Status Display */}
-                {(hasCompletedScrape || hasFailed || isScraping) && (
-                  <Card className="mt-6">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Label>Status:</Label>
-                        <div
-                          className={`px-2 py-1 rounded text-sm font-medium ${
-                            scrapeStatus === "scraping"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                              : scrapeStatus === "completed"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : scrapeStatus === "failed"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                              : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-                          }`}
-                        >
-                          {scrapeStatus === "scraping" &&
-                            "🔄 Scraping in progress..."}
-                          {scrapeStatus === "completed" &&
-                            "✅ Completed successfully"}
-                          {scrapeStatus === "failed" && "❌ Failed"}
-                        </div>
-                      </div>
-
-                      {hasCompletedScrape && jobId && (
-                        <div className="mt-3">
-                          <Label>Job ID:</Label>
-                          <div className="mt-1 p-2 bg-muted rounded font-mono text-sm break-all">
-                            {jobId}
+                  {/* Status Display */}
+                  {(hasCompletedScrape || hasFailed || isScraping) && (
+                    <Card className="mt-6">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Label>Status:</Label>
+                          <div
+                            className={`px-2 py-1 rounded text-sm font-medium ${
+                              scrapeStatus === "scraping"
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                : scrapeStatus === "completed"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                : scrapeStatus === "failed"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                            }`}
+                          >
+                            {scrapeStatus === "scraping" &&
+                              "🔄 Scraping in progress..."}
+                            {scrapeStatus === "completed" &&
+                              "✅ Completed successfully"}
+                            {scrapeStatus === "failed" && "❌ Failed"}
                           </div>
                         </div>
-                      )}
 
-                      {isScraping && (
-                        <div className="mt-3">
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full animate-pulse"
-                              style={{ width: "60%" }}
-                            ></div>
+                        {hasCompletedScrape && jobId && (
+                          <div className="mt-3">
+                            <Label>Job ID:</Label>
+                            <div className="mt-1 p-2 bg-muted rounded font-mono text-sm break-all">
+                              {jobId}
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            Please wait while we scrape the data...
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-              </CardContent>
-            </Card>
+                        )}
 
-            {/* <Card className="shadow-card">
+                        {isScraping && (
+                          <div className="mt-3">
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div
+                                className="bg-primary h-2 rounded-full animate-pulse"
+                                style={{ width: "60%" }}
+                              ></div>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-2">
+                              Please wait while we scrape the data...
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-3">
                   <MapPin className="h-6 w-6 text-primary" />
@@ -793,8 +901,8 @@ export const Extraction: React.FC = () => {
               </CardContent>
             </Card> */}
 
-            {/* Recent Templates */}
-            {/* <Card>
+              {/* Recent Templates */}
+              {/* <Card>
               <CardHeader>
                 <CardTitle>Recent Templates</CardTitle>
               </CardHeader>
@@ -837,10 +945,11 @@ export const Extraction: React.FC = () => {
                 </div>
               </CardContent>
             </Card> */}
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
