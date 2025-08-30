@@ -511,8 +511,7 @@ export const ExtractionsTable: React.FC = () => {
                 <Eye className="h-4 w-4" />
               </Button> */}
               {extraction.status === "completed" &&
-                extraction.recordsCollected &&
-                extraction.recordsCollected > 0 && (
+                (extraction.recordsCollected ?? 0) > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -561,8 +560,7 @@ export const ExtractionsTable: React.FC = () => {
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem>View Details</DropdownMenuItem>
                   {extraction.status === "completed" && 
-                   extraction.recordsCollected && 
-                   extraction.recordsCollected > 0 && (
+                   (extraction.recordsCollected ?? 0) > 0 && (
                     <>
                       <DropdownMenuItem>Download CSV</DropdownMenuItem>
                       <DropdownMenuItem>Download Excel</DropdownMenuItem>
