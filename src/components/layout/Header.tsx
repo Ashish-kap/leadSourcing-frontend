@@ -52,21 +52,21 @@ export const Header: React.FC = () => {
       {/* Search & Actions */}
       <div className="flex items-center space-x-2 sm:space-x-4">
         {/* Search Bar - Hidden on mobile */}
-        <div className="relative hidden lg:block">
+        {/* <div className="relative hidden lg:block">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search extractions..."
             className="pl-10 w-48 xl:w-64 bg-muted border-0 focus:ring-2 focus:ring-primary"
           />
-        </div>
+        </div> */}
 
         {/* Mobile Search Button */}
-        <Button variant="ghost" size="sm" className="lg:hidden h-8 w-8 p-0">
+        {/* <Button variant="ghost" size="sm" className="lg:hidden h-8 w-8 p-0">
           <Search className="h-5 w-5" />
-        </Button>
+        </Button> */}
 
         {/* Notifications */}
-        <Button
+        {/* <Button
           variant="ghost"
           size="sm"
           className="relative hover:bg-accent h-8 w-8 p-0"
@@ -75,7 +75,7 @@ export const Header: React.FC = () => {
           <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs bg-primary text-primary-foreground flex items-center justify-center">
             3
           </Badge>
-        </Button>
+        </Button> */}
 
         {/* User Menu */}
         <DropdownMenu>
