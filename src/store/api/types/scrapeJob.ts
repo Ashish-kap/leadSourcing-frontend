@@ -14,6 +14,7 @@ export interface scrapeJobPostRequest {
     value: number;
   };
   reviewsWithinLastYears?: number | null;
+  isExtractEmail?: boolean;
 }
 
 export interface scrapeJobPostResponse {

@@ -144,7 +144,7 @@ const LandingPage = () => {
       company: "TechStartup Inc",
       image: "/api/placeholder/64/64",
       rating: 5,
-      text: "MapExtractor Pro helped us generate 300% more leads in our target market. The data quality is exceptional!",
+      text: "LeadHuntr helped us generate 300% more leads in our target market. The data quality is exceptional!",
     },
     {
       name: "Mike Chen",
@@ -326,7 +326,7 @@ const LandingPage = () => {
               What Our Customers Say
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join thousands of businesses growing with MapExtractor Pro
+              Join thousands of businesses growing with LeadHuntr
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -374,8 +374,8 @@ const LandingPage = () => {
             Ready to Supercharge Your Lead Generation?
           </h2>
           <p className="text-xl mb-8 text-white/90">
-            Join thousands of businesses using MapExtractor Pro to grow their
-            customer base
+            Join thousands of businesses using LeadHuntr to grow their customer
+            base
           </p>
           <Button
             size="lg"
@@ -393,11 +393,14 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                {/* <div className="w-8 h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">M</span>
+                </div> */}
+                <div onClick={() => navigate("/")} className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                  <MapPin className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-xl font-bold gradient-text">
-                  MapExtractor Pro
+                <span onClick={() => navigate("/")} className="text-xl cursor-pointer font-bold gradient-text">
+                  LeadHuntr
                 </span>
               </div>
               <p className="text-muted-foreground">
@@ -471,7 +474,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 MapExtractor Pro. All rights reserved.</p>
+            <p>&copy; 2024 LeadHuntr. All rights reserved.</p>
           </div>
         </div>
       </footer>
