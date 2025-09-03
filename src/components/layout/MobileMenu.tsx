@@ -73,9 +73,8 @@ export const MobileMenu: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-foreground">
-                    MapExtractor
+                    LeadHuntr
                   </h1>
-                  <p className="text-xs text-muted-foreground">Pro</p>
                 </div>
               </div>
               <Button

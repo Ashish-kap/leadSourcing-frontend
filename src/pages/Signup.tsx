@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,7 @@ import {
 
 const Signup = () => {
   const { signup, googleAuth, isSigningUp, isGoogleLoggingIn } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -175,11 +176,17 @@ const Signup = () => {
           {/* Logo */}
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+              <div
+                onClick={() => navigate("/home")}
+                className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
+              >
                 <MapPin className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold gradient-text">
-                MapExtractor Pro
+              <span
+                onClick={() => navigate("/home")}
+                className="text-2xl cursor-pointer font-bold gradient-text"
+              >
+                LeadHuntr
               </span>
             </div>
             <h1 className="text-3xl font-bold">Create your account</h1>

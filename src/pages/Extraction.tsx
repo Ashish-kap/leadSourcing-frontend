@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -63,6 +64,7 @@ export const Extraction: React.FC = () => {
       value: null as number | null,
     },
     reviewsWithinLastYears: null as number | null,
+    isExtractEmail: true,
   });
 
   const [location, setLocation] = useState<LocationState>({
@@ -159,6 +161,13 @@ export const Extraction: React.FC = () => {
     }));
   };
 
+  const handleCheckboxChange = (checked: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      isExtractEmail: checked === true,
+    }));
+  };
+
   const handleRatingOperatorChange = (
     operator: "gt" | "lt" | "gte" | "lte"
   ) => {
@@ -229,6 +238,7 @@ export const Extraction: React.FC = () => {
             }
           : undefined,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
+      isExtractEmail: formData.isExtractEmail,
     };
 
     const scrapeRequest = Object.fromEntries(
@@ -279,6 +289,11 @@ export const Extraction: React.FC = () => {
           );
         }
 
+        // Boolean fields
+        if (key === "isExtractEmail") {
+          return typeof value === "boolean";
+        }
+
         return false;
       })
     ) as scrapeJobPostRequest;
@@ -305,6 +320,7 @@ export const Extraction: React.FC = () => {
         value: null as number | null,
       },
       reviewsWithinLastYears: null,
+      isExtractEmail: true,
     });
     setLocation({
       countryCode: "",
@@ -471,7 +487,9 @@ export const Extraction: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="maxRecords">Number of businesses ?</Label>
+                          <Label htmlFor="maxRecords">
+                            Number of businesses ?
+                          </Label>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
@@ -646,6 +664,38 @@ export const Extraction: React.FC = () => {
                         max="10"
                       />
                     </div> */}
+                    </div>
+
+                    {/* Email Extraction Option */}
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-3">
+                        <Checkbox
+                          id="isExtractEmail"
+                          checked={formData.isExtractEmail}
+                          onCheckedChange={handleCheckboxChange}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="isExtractEmail"
+                            className="cursor-pointer"
+                          >
+                            Scrape Email
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Enable this option to attempt extracting email
+                                addresses from business listings when available.
+                                This may increase scraping time but provides
+                                additional contact information.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
