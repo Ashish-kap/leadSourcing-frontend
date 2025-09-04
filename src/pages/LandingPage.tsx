@@ -96,7 +96,8 @@ const LandingPage = () => {
       period: "/month",
       description: "Perfect for small businesses and freelancers",
       features: [
-        "1,000 extractions/month",
+        "Limited extractions",
+        // "1,000 extractions/month",
         "Basic business info",
         "CSV export",
         "Email support",
@@ -110,7 +111,8 @@ const LandingPage = () => {
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "10,000 extractions/month",
+        "Unlimited extractions",
+        // "10,000 extractions/month",
         "Complete business profiles",
         "All export formats",
         "Priority support",
@@ -120,42 +122,42 @@ const LandingPage = () => {
       ],
       popular: true,
     },
-    {
-      name: "Enterprise",
-      price: "$49",
-      period: "/month",
-      description: "For large organizations and teams",
-      features: [
-        "Unlimited extractions",
-        "Custom data fields",
-        "White-label solution",
-        "Dedicated account manager",
-        "Custom integrations",
-        "Advanced analytics",
-        "SLA guarantee",
-      ],
-      popular: false,
-    },
+    // {
+    //   name: "Enterprise",
+    //   price: "$49",
+    //   period: "/month",
+    //   description: "For large organizations and teams",
+    //   features: [
+    //     "Unlimited extractions",
+    //     "Custom data fields",
+    //     "White-label solution",
+    //     "Dedicated account manager",
+    //     "Custom integrations",
+    //     "Advanced analytics",
+    //     "SLA guarantee",
+    //   ],
+    //   popular: false,
+    // },
   ];
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      company: "TechStartup Inc",
+      name: "Mahesh Surve",
+      company: "Manifest Solutions Pvt Ltd",
       image: "/api/placeholder/64/64",
       rating: 5,
       text: "LeadHuntr helped us generate 300% more leads in our target market. The data quality is exceptional!",
     },
     {
-      name: "Mike Chen",
-      company: "Local Marketing Agency",
+      name: "Siddharth Jaiswal",
+      company: "Infosys Pvt Ltd",
       image: "/api/placeholder/64/64",
       rating: 5,
       text: "We've saved countless hours on research. This tool is a game-changer for our lead generation campaigns.",
     },
     {
-      name: "Emily Rodriguez",
-      company: "Real Estate Solutions",
+      name: "Priya Uttam",
+      company: "Shail Infotech",
       image: "/api/placeholder/64/64",
       rating: 5,
       text: "The accuracy and speed of data extraction is incredible. Our ROI improved by 250% in just 3 months.",
@@ -272,7 +274,8 @@ const LandingPage = () => {
               Choose the plan that fits your business needs
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* <div className="grid md:grid-cols-3 gap-8"> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <Card
                 key={index}
@@ -303,7 +306,7 @@ const LandingPage = () => {
                     ))}
                   </ul>
                   <Button
-                    className={`w-full mt-6 ${
+                    className={`w-full mt-6 cursor-pointer ${
                       plan.popular ? "bg-primary" : ""
                     }`}
                     variant={plan.popular ? "default" : "outline"}
@@ -396,10 +399,16 @@ const LandingPage = () => {
                 {/* <div className="w-8 h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">M</span>
                 </div> */}
-                <div onClick={() => navigate("/")} className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                <div
+                  onClick={() => navigate("/")}
+                  className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
+                >
                   <MapPin className="h-6 w-6 text-white" />
                 </div>
-                <span onClick={() => navigate("/")} className="text-xl cursor-pointer font-bold gradient-text">
+                <span
+                  onClick={() => navigate("/")}
+                  className="text-xl cursor-pointer font-bold gradient-text"
+                >
                   LeadHuntr
                 </span>
               </div>
