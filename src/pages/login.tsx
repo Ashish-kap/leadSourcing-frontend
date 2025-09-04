@@ -270,12 +270,12 @@ const Login = () => {
                   </div>
                   <span
                     onClick={() => navigate("/home")}
-                    className="text-3xl cursor-pointer font-bold gradient-text tracking-tight"
+                    className="text-4xl cursor-pointer font-bold gradient-text tracking-tight"
                   >
                     LeadHuntr
                   </span>
                 </div>
-                <h1 className="text-4xl font-bold mb-2 pb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold mb-2 pb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                   Sign in with Google
                 </h1>
                 <p className="text-muted-foreground text-lg leading-relaxed">
