@@ -183,7 +183,7 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-primary hover:bg-white/90 px-8"
+                className="bg-white text-primary cursor-pointer hover:bg-white/90 px-8"
                 onClick={handleStartTrial}
               >
                 Start Free Trial <ArrowRight className="ml-2 h-5 w-5" />
@@ -379,7 +379,7 @@ const LandingPage = () => {
           </p>
           <Button
             size="lg"
-            className="bg-white text-primary hover:bg-white/90 px-8"
+            className="bg-white text-primary cursor-pointer hover:bg-white/90 px-8"
             onClick={handleStartTrial}
           >
             Start Your Free Trial Today <ArrowRight className="ml-2 h-5 w-5" />

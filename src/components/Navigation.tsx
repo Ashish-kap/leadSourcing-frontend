@@ -80,12 +80,12 @@ const Navigation = () => {
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center  space-x-4">
             <Link to="/login">
-              <Button variant="ghost">Login</Button>
+              <Button variant="ghost" className="cursor-pointer">Login</Button>
             </Link>
-            <Link to="/signup">
-              <Button>Get Started</Button>
+            <Link to="/login">
+              <Button className="cursor-pointer">Get Started</Button>
             </Link>
           </div>
 
@@ -132,9 +132,9 @@ const Navigation = () => {
                     Login
                   </Button>
                 </Link>
-                <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                {/* <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button className="w-full">Get Started</Button>
-                </Link>
+                </Link> */}
               </div>
             </div>
           </div>

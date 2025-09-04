@@ -10,7 +10,7 @@ export const UserSession = () => {
     if (token) {
       setToken(token);
     } else {
-      navigate("/signup");
+      navigate("/login");
     }
   }, []);
 

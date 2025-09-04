@@ -155,12 +155,118 @@
 /* Base resets mapped to tokens via utilities */
 @layer base {
   * {
-    /* border color utility will read from --color-border */
     @apply border-border;
   }
   body {
-    /* background/text utilities read from --color-background/--color-foreground */
     @apply bg-background text-foreground;
+  }
+}
+
+
+
+
+
+@layer components {
+  /* Premium Card Styles */
+  .card-elegant {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-premium);
+    box-shadow: var(--shadow-premium);
+    backdrop-filter: blur(20px);
+    transition: var(--transition-smooth);
+  }
+  
+  .card-elegant:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elegant), var(--shadow-glow);
+  }
+
+  /* Premium Button Variants */
+  .btn-google {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    transition: var(--transition-bounce);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-google::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: var(--transition-smooth);
+    z-index: -1;
+  }
+  
+  .btn-google:hover::before {
+    left: 0;
+    opacity: 0.05;
+  }
+  
+  .btn-google:hover {
+    transform: translateY(-1px);
+    border-color: hsl(var(--primary) / 0.2);
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Hero Gradient Background */
+  .hero-gradient {
+    background: var(--gradient-hero);
+    position: relative;
+  }
+  
+  .hero-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, hsl(0 0% 0% / 0.1) 100%);
+    pointer-events: none;
+  }
+
+  /* Trust Indicators */
+  .trust-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+  }
+  
+  .trust-indicator:hover {
+    transform: scale(1.05);
+  }
+
+  .trust-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Glass Morphism Effect */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }
 

@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from "react";
-import { Country, State } from "country-state-city";
+import { Country, State, City } from "country-state-city";
 import { useScrapeJob } from "../store/hooks/useScrape";
 import { scrapeJobPostRequest } from "../store/api/types/scrapeJob";
+import { useGetCurrentUserQuery } from "@/store/api/authApi";
 import { toast } from "sonner";
 
 // Shadcn/UI imports
@@ -41,6 +42,7 @@ interface LocationState {
 
 export const Extraction: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { data: userData } = useGetCurrentUserQuery();
   const {
     startScraping,
     isScraping,
@@ -53,7 +55,7 @@ export const Extraction: React.FC = () => {
 
   const [formData, setFormData] = useState({
     keyword: "",
-    maxRecords: 50,
+    maxRecords: null as number | null,
     reviewTimeRange: null as number | null,
     ratingFilter: {
       operator: "gte" as "gt" | "lt" | "gte" | "lte",
@@ -85,10 +87,10 @@ export const Extraction: React.FC = () => {
   }, [location.countryCode]);
 
   // // Get cities for selected state
-  // const cities = useMemo(() => {
-  //   if (!location.countryCode || !location.stateCode) return [];
-  //   return City.getCitiesOfState(location.countryCode, location.stateCode);
-  // }, [location.countryCode, location.stateCode]);
+  const cities = useMemo(() => {
+    if (!location.countryCode || !location.stateCode) return [];
+    return City.getCitiesOfState(location.countryCode, location.stateCode);
+  }, [location.countryCode, location.stateCode]);
 
   const handleCountryChange = (countryCode: string) => {
     setLocation({
@@ -106,12 +108,12 @@ export const Extraction: React.FC = () => {
     }));
   };
 
-  // const handleCityChange = (city: string) => {
-  //   setLocation((prev) => ({
-  //     ...prev,
-  //     city,
-  //   }));
-  // };
+  const handleCityChange = (city: string) => {
+    setLocation((prev) => ({
+      ...prev,
+      city,
+    }));
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -203,6 +205,19 @@ export const Extraction: React.FC = () => {
 
     if (!location.countryCode) {
       toast.error("Please select a country");
+      return;
+    }
+
+    if (!formData.maxRecords || formData.maxRecords <= 0) {
+      toast.error("Please enter the number of businesses to extract");
+      return;
+    }
+
+    // Check plan limits for free users
+    if (userData?.user.plan === "free" && formData.maxRecords > 50) {
+      toast.error(
+        "Free plans are limited to 50 records. Please upgrade to Business plan for unlimited extractions."
+      );
       return;
     }
 
@@ -301,6 +316,8 @@ export const Extraction: React.FC = () => {
     try {
       const result = await startScraping(scrapeRequest);
       toast.success(`Scraping started! Job ID: ${result.jobId}`);
+      // Set flag to show live data dialog on Dashboard
+      localStorage.setItem("showLiveDataDialog", "true");
     } catch (error) {
       // Error handled by the hook
     }
@@ -309,7 +326,7 @@ export const Extraction: React.FC = () => {
   const handleReset = () => {
     setFormData({
       keyword: "",
-      maxRecords: 50,
+      maxRecords: null as number | null,
       reviewTimeRange: null,
       ratingFilter: {
         operator: "gte" as "gt" | "lt" | "gte" | "lte",
@@ -390,7 +407,7 @@ export const Extraction: React.FC = () => {
                     </div>
 
                     {/* Location Selection */}
-                    <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="country">Country *</Label>
@@ -462,25 +479,25 @@ export const Extraction: React.FC = () => {
                         </Select>
                       </div>
 
-                      {/* <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
-                      <Select
-                        value={location.city}
-                        onValueChange={handleCityChange}
-                        disabled={!location.stateCode}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select city" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {cities.map((city) => (
-                            <SelectItem key={city.name} value={city.name}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div> */}
+                      <div className="space-y-2">
+                        <Label htmlFor="city">City</Label>
+                        <Select
+                          value={location.city}
+                          onValueChange={handleCityChange}
+                          disabled={!location.stateCode}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select city" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cities.map((city) => (
+                              <SelectItem key={city.name} value={city.name}>
+                                {city.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
                     {/* Advanced Options */}
@@ -488,7 +505,7 @@ export const Extraction: React.FC = () => {
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="maxRecords">
-                            Number of businesses ?
+                            Number of businesses *
                           </Label>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -506,10 +523,12 @@ export const Extraction: React.FC = () => {
                           id="maxRecords"
                           name="maxRecords"
                           type="number"
-                          value={formData.maxRecords}
+                          value={formData.maxRecords || ""}
                           onChange={handleInputChange}
+                          placeholder="eg. 500"
                           min="1"
                           max="1000"
+                          required
                         />
                       </div>
 

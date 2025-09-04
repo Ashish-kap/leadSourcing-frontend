@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import Signup from "./pages/Signup";
+// import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 // import { UserSession } from "./UserSession";
 import Login from "./pages/login";
@@ -12,7 +12,7 @@ const RoutesMain = () => (
   <Routes>
     <Route path="/home" element={<LandingPage />} />
     <Route path="/login" element={<Login />} />
-    <Route path="/signup" element={<Signup />} />
+    {/* <Route path="/signup" element={<Signup />} /> */}
     <Route path="*" element={<NotFound />} />
     <Route element={<ProtectedRoute />}>
       <Route path="/" element={<Dashboard />} />
