@@ -285,7 +285,6 @@ const Login = () => {
             </CardHeader>
 
             <CardContent className="space-y-8">
-              {/* Premium Google Auth Button */}
               <Button
                 variant="secondary"
                 size="lg"
