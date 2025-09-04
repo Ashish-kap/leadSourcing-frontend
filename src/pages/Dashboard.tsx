@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart3,
   // Users,
   DollarSign,
-  Infinity,
   // Activity,
   // TrendingUp,
 } from "lucide-react";
@@ -14,11 +13,30 @@ import { ExtractionsTable } from "@/components/dashboard/ExtractionsTable";
 // import { QuickActions } from "@/components/dashboard/QuickActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useGetCurrentUserQuery } from "@/store/api/authApi";
 
 export const Dashboard: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showLiveDataDialog, setShowLiveDataDialog] = useState(false);
   const { data: userData } = useGetCurrentUserQuery();
+
+  // Check for live data dialog flag on component mount
+  useEffect(() => {
+    const shouldShowDialog = localStorage.getItem("showLiveDataDialog");
+    if (shouldShowDialog === "true") {
+      setShowLiveDataDialog(true);
+      // Clear the flag so it doesn't show again
+      localStorage.removeItem("showLiveDataDialog");
+    }
+  }, []);
 
   const statsData = [
     {
@@ -228,6 +246,52 @@ export const Dashboard: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Live Data Extraction Dialog */}
+      <AlertDialog
+        open={showLiveDataDialog}
+        onOpenChange={setShowLiveDataDialog}
+      >
+        <AlertDialogContent className="sm:max-w-[500px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span>🚀 Live Data Extraction Started</span>
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-3 pt-4">
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
+                  <strong>
+                    We scrape fresh, real-time data directly from Google Maps
+                  </strong>{" "}
+                  - not from outdated databases like other tools. This ensures
+                  you get the most current business information, contact
+                  details, and ratings available.
+                </p>
+              </div>
+              <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                  ⏱️ <strong>Processing Time:</strong> Since we're gathering
+                  live data, the extraction process may take a few minutes
+                  depending on your search criteria.
+                  <span className="block mt-2 font-medium">
+                    Please be patient while we collect the latest information
+                    for you.
+                  </span>
+                </p>
+              </div>
+              <div className="text-center pt-2">
+                <AlertDialogAction
+                  onClick={() => setShowLiveDataDialog(false)}
+                  className="w-full"
+                >
+                  Got it, thanks!
+                </AlertDialogAction>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
