@@ -20,7 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  Clock,
+  // Clock,
   Trash2,
   // Pause,
 } from "lucide-react";
@@ -81,113 +81,118 @@ const statusColors: Record<string, string> = {
   waiting: "bg-warning text-warning-foreground",
   delayed: "bg-warning text-warning-foreground",
   pause: "bg-warning text-warning-foreground",
+  data_not_found: "bg-muted text-muted-foreground",
 };
 
 // Function to calculate estimated completion time
-const calculateEstimatedTime = (
-  progress: number,
-  maxRecords: number | null | undefined,
-  createdAt: string,
-  status: string
-): { estimatedTime: string; remainingTime: string } => {
-  // Validate maxRecords and provide fallback
-  const validMaxRecords =
-    maxRecords && !isNaN(maxRecords) && maxRecords > 0 ? maxRecords : 100;
+// const calculateEstimatedTime = (
+//   progress: number,
+//   maxRecords: number | null | undefined,
+//   createdAt: string,
+//   status: string
+// ): { estimatedTime: string; remainingTime: string } => {
+//   // Validate maxRecords and provide fallback
+//   const validMaxRecords =
+//     maxRecords && !isNaN(maxRecords) && maxRecords > 0 ? maxRecords : 100;
 
-  // If maxRecords is invalid or missing, return generic estimate
-  if (!maxRecords || isNaN(maxRecords) || maxRecords <= 0) {
-    if (status === "active") {
-      return {
-        estimatedTime: "Calculating...",
-        remainingTime: "Calculating...",
-      };
-    }
-    return { estimatedTime: "Unknown", remainingTime: "-" };
-  }
+//   // If maxRecords is invalid or missing, return generic estimate
+//   if (!maxRecords || isNaN(maxRecords) || maxRecords <= 0) {
+//     if (status === "active") {
+//       return {
+//         estimatedTime: "Calculating...",
+//         remainingTime: "Calculating...",
+//       };
+//     }
+//     return { estimatedTime: "Unknown", remainingTime: "-" };
+//   }
 
-  // If completed, no estimation needed
-  if (status === "completed") {
-    return { estimatedTime: "Completed", remainingTime: "0m" };
-  }
+//   // If completed, no estimation needed
+//   if (status === "completed") {
+//     return { estimatedTime: "Completed", remainingTime: "0m" };
+//   }
 
-  // If failed or paused, show status
-  if (status === "failed") {
-    return { estimatedTime: "Failed", remainingTime: "-" };
-  }
+//   // If failed, paused, or no data found, show status
+//   if (status === "failed") {
+//     return { estimatedTime: "Failed", remainingTime: "-" };
+//   }
 
-  if (status === "pause" || status === "waiting" || status === "delayed") {
-    return { estimatedTime: "Paused", remainingTime: "-" };
-  }
+//   if (status === "data_not_found") {
+//     return { estimatedTime: "No Data Found", remainingTime: "-" };
+//   }
 
-  // Calculate elapsed time
-  const startTime = new Date(createdAt).getTime();
-  const currentTime = new Date().getTime();
-  const elapsedMinutes = (currentTime - startTime) / (1000 * 60);
+//   if (status === "pause" || status === "waiting" || status === "delayed") {
+//     return { estimatedTime: "Paused", remainingTime: "-" };
+//   }
 
-  // Validate progress
-  const validProgress = !isNaN(progress) && progress >= 0 ? progress : 0;
+//   // Calculate elapsed time
+//   const startTime = new Date(createdAt).getTime();
+//   const currentTime = new Date().getTime();
+//   const elapsedMinutes = (currentTime - startTime) / (1000 * 60);
 
-  // If no progress yet, use default estimate
-  if (validProgress <= 0) {
-    const minTime = Math.ceil(validMaxRecords * 0.4); // 0.4 minutes per record (min)
-    const maxTime = Math.ceil(validMaxRecords * 1.0); // 1.0 minutes per record (max)
-    return {
-      estimatedTime: `${minTime}-${maxTime}m`,
-      remainingTime: `${minTime}-${maxTime}m`,
-    };
-  }
+//   // Validate progress
+//   const validProgress = !isNaN(progress) && progress >= 0 ? progress : 0;
 
-  // Calculate rate based on current progress
-  const recordsProcessed = Math.floor((validProgress / 100) * validMaxRecords);
-  const remainingRecords = validMaxRecords - recordsProcessed;
+//   // If no progress yet, use default estimate
+//   if (validProgress <= 0) {
+//     const minTime = Math.ceil(validMaxRecords * 0.4); // 0.4 minutes per record (min)
+//     const maxTime = Math.ceil(validMaxRecords * 1.0); // 1.0 minutes per record (max)
+//     return {
+//       estimatedTime: `${minTime}-${maxTime}m`,
+//       remainingTime: `${minTime}-${maxTime}m`,
+//     };
+//   }
 
-  if (recordsProcessed > 0 && elapsedMinutes > 0) {
-    // Calculate rate from actual performance
-    const ratePerMinute = recordsProcessed / elapsedMinutes;
-    const estimatedRemainingMinutes = Math.ceil(
-      remainingRecords / ratePerMinute
-    );
+//   // Calculate rate based on current progress
+//   const recordsProcessed = Math.floor((validProgress / 100) * validMaxRecords);
+//   const remainingRecords = validMaxRecords - recordsProcessed;
 
-    return {
-      estimatedTime: formatTime(estimatedRemainingMinutes + elapsedMinutes),
-      remainingTime: formatTime(estimatedRemainingMinutes),
-    };
-  }
+//   if (recordsProcessed > 0 && elapsedMinutes > 0) {
+//     // Calculate rate from actual performance
+//     const ratePerMinute = recordsProcessed / elapsedMinutes;
+//     const estimatedRemainingMinutes = Math.ceil(
+//       remainingRecords / ratePerMinute
+//     );
 
-  // Fallback to default calculation
-  const avgTimePerRecord = 0.7; // Average of 0.4-1.0 minutes
-  const remainingMinutes = Math.ceil(remainingRecords * avgTimePerRecord);
+//     return {
+//       estimatedTime: formatTime(estimatedRemainingMinutes + elapsedMinutes),
+//       remainingTime: formatTime(estimatedRemainingMinutes),
+//     };
+//   }
 
-  return {
-    estimatedTime: formatTime(remainingMinutes + elapsedMinutes),
-    remainingTime: formatTime(remainingMinutes),
-  };
-};
+//   // Fallback to default calculation
+//   const avgTimePerRecord = 0.7; // Average of 0.4-1.0 minutes
+//   const remainingMinutes = Math.ceil(remainingRecords * avgTimePerRecord);
+
+//   return {
+//     estimatedTime: formatTime(remainingMinutes + elapsedMinutes),
+//     remainingTime: formatTime(remainingMinutes),
+//   };
+// };
 
 // Helper function to format time in a readable way
-const formatTime = (minutes: number): string => {
-  if (minutes < 60) {
-    return `${minutes}m`;
-  }
+// const formatTime = (minutes: number): string => {
+//   if (minutes < 60) {
+//     return `${minutes}m`;
+//   }
 
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
+//   const hours = Math.floor(minutes / 60);
+//   const remainingMinutes = minutes % 60;
 
-  if (hours < 24) {
-    return remainingMinutes > 0
-      ? `${hours}h ${remainingMinutes}m`
-      : `${hours}h`;
-  }
+//   if (hours < 24) {
+//     return remainingMinutes > 0
+//       ? `${hours}h ${remainingMinutes}m`
+//       : `${hours}h`;
+//   }
 
-  const days = Math.floor(hours / 24);
-  const remainingHours = hours % 24;
+//   const days = Math.floor(hours / 24);
+//   const remainingHours = hours % 24;
 
-  if (remainingHours > 0) {
-    return `${days}d ${remainingHours}h`;
-  }
+//   if (remainingHours > 0) {
+//     return `${days}d ${remainingHours}h`;
+//   }
 
-  return `${days}d`;
-};
+//   return `${days}d`;
+// };
 
 export const ExtractionsTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -402,7 +407,9 @@ export const ExtractionsTable: React.FC = () => {
                   <Progress
                     value={displayProgress}
                     className={`h-2 ${
-                      status === "failed" ? "bg-destructive/20" : ""
+                      status === "failed" || status === "data_not_found"
+                        ? "bg-destructive/20"
+                        : ""
                     }`}
                   />
                 </div>
@@ -414,7 +421,8 @@ export const ExtractionsTable: React.FC = () => {
                 <span>{recordsDisplay}</span>
                 <span
                   className={
-                    status === "failed" && recordsCollected === 0
+                    (status === "failed" && recordsCollected === 0) ||
+                    status === "data_not_found"
                       ? "text-destructive"
                       : ""
                   }
@@ -426,63 +434,63 @@ export const ExtractionsTable: React.FC = () => {
           );
         },
       },
-      {
-        accessorKey: "estimatedTime",
-        header: "Est. Completion",
-        cell: ({ row }) => {
-          const jobId = row.original.id;
-          const status = row.original.status;
-          const maxRecords = row.original.maxRecords;
-          const createdAt = row.original.createdAt;
-          const originalProgress = row.original.progress;
+      // {
+      //   accessorKey: "estimatedTime",
+      //   header: "Est. Completion",
+      //   cell: ({ row }) => {
+      //     const jobId = row.original.id;
+      //     const status = row.original.status;
+      //     const maxRecords = row.original.maxRecords;
+      //     const createdAt = row.original.createdAt;
+      //     const originalProgress = row.original.progress;
 
-          // Use real-time progress if available, otherwise use original progress
-          const currentProgress =
-            realtimeProgress[jobId] ?? originalProgress ?? 0;
+      //     // Use real-time progress if available, otherwise use original progress
+      //     const currentProgress =
+      //       realtimeProgress[jobId] ?? originalProgress ?? 0;
 
-          const { estimatedTime, remainingTime } = calculateEstimatedTime(
-            currentProgress,
-            maxRecords,
-            createdAt,
-            status
-          );
+      //     const { estimatedTime, remainingTime } = calculateEstimatedTime(
+      //       currentProgress,
+      //       maxRecords,
+      //       createdAt,
+      //       status
+      //     );
 
-          // Validate maxRecords for display
-          // const validMaxRecords =
-          //   maxRecords && !isNaN(maxRecords) && maxRecords > 0
-          //     ? maxRecords
-          //     : null;
-          // const validProgress =
-          //   !isNaN(currentProgress) && currentProgress >= 0
-          //     ? currentProgress
-          //     : 0;
-          // const recordsProcessed = validMaxRecords
-          //   ? Math.floor((validProgress / 100) * validMaxRecords)
-          //   : 0;
+      //     // Validate maxRecords for display
+      //     // const validMaxRecords =
+      //     //   maxRecords && !isNaN(maxRecords) && maxRecords > 0
+      //     //     ? maxRecords
+      //     //     : null;
+      //     // const validProgress =
+      //     //   !isNaN(currentProgress) && currentProgress >= 0
+      //     //     ? currentProgress
+      //     //     : 0;
+      //     // const recordsProcessed = validMaxRecords
+      //     //   ? Math.floor((validProgress / 100) * validMaxRecords)
+      //     //   : 0;
 
-          return (
-            <div className="min-w-[140px] space-y-1">
-              {/* <div className="text-xs text-muted-foreground">
-                {validMaxRecords
-                  ? `${recordsProcessed}/${validMaxRecords} records`
-                  : "Processing..."}
-              </div> */}
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3 text-muted-foreground" />
-                <div className="text-sm font-medium">
-                  {status === "active" ? remainingTime : estimatedTime}
-                </div>
-              </div>
-              {status === "active" && (
-                <div className="text-xs text-muted-foreground">remaining</div>
-              )}
-              {/* {status === "completed" && (
-                <div className="text-xs text-green-600">Done</div>
-              )} */}
-            </div>
-          );
-        },
-      },
+      //     return (
+      //       <div className="min-w-[140px] space-y-1">
+      //         {/* <div className="text-xs text-muted-foreground">
+      //           {validMaxRecords
+      //             ? `${recordsProcessed}/${validMaxRecords} records`
+      //             : "Processing..."}
+      //         </div> */}
+      //         <div className="flex items-center gap-1">
+      //           <Clock className="h-3 w-3 text-muted-foreground" />
+      //           <div className="text-sm font-medium">
+      //             {status === "active" ? remainingTime : null}
+      //           </div>
+      //         </div>
+      //         {status === "active" && (
+      //           <div className="text-xs text-muted-foreground">remaining</div>
+      //         )}
+      //         {/* {status === "completed" && (
+      //           <div className="text-xs text-green-600">Done</div>
+      //         )} */}
+      //       </div>
+      //     );
+      //   },
+      // },
       {
         accessorKey: "status",
         header: "Status",
@@ -491,9 +499,11 @@ export const ExtractionsTable: React.FC = () => {
           return (
             <div className="min-w-[100px]">
               <Badge className={statusColors[status] || ""}>
-                {status
-                  .replace("-", " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
+                {status === "data_not_found"
+                  ? "Data not found"
+                  : status
+                      .replace("-", " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
               </Badge>
             </div>
           );
@@ -639,6 +649,7 @@ export const ExtractionsTable: React.FC = () => {
                 <SelectItem value="completed">Completed</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="data_not_found">No Data Found</SelectItem>
               </SelectContent>
             </Select>
           </div>
