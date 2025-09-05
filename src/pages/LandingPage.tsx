@@ -108,6 +108,7 @@ const LandingPage = () => {
     {
       name: "Professional",
       price: "$9",
+      oldPrice: "$29",
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
@@ -285,12 +286,17 @@ const LandingPage = () => {
               >
                 {plan.popular && (
                   <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
-                    Most Popular
+                    Limited Time Offer
                   </Badge>
                 )}
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center justify-center gap-3">
+                    {plan.oldPrice ? (
+                      <span className="text-xl text-muted-foreground line-through">
+                        {plan.oldPrice}
+                      </span>
+                    ) : null}
                     <span className="text-4xl font-bold">{plan.price}</span>
                     <span className="text-muted-foreground">{plan.period}</span>
                   </div>
