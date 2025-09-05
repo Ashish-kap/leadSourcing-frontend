@@ -25,6 +25,7 @@ import {
   // Pause,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/service/analytics";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -525,12 +526,16 @@ export const ExtractionsTable: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() =>
+                    onClick={() => (
+                      trackEvent("download_csv", {
+                        job_id: row.original.id,
+                        records: row.original.recordsCollected ?? 0,
+                      }),
                       downloadCsv(
                         row.original.id,
                         `${row.original.keyword}-extraction.csv`
                       )
-                    }
+                    )}
                     disabled={isDownloading}
                   >
                     <Download
@@ -542,9 +547,10 @@ export const ExtractionsTable: React.FC = () => {
                 )}
               <DeleteConfirmDialog
                 description={`This action cannot be undone. This will permanently delete the extraction for "${extraction.keyword}" and remove all associated data.`}
-                onConfirm={() =>
-                  handleDeleteJob(row.original.id, row.original.keyword)
-                }
+                onConfirm={() => {
+                  trackEvent("delete_job", { job_id: row.original.id });
+                  handleDeleteJob(row.original.id, row.original.keyword);
+                }}
                 isLoading={isDeletingJob}
               >
                 <Button

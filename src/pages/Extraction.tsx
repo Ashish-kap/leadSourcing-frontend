@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Loader2, RotateCcw, HelpCircle } from "lucide-react";
+import { trackEvent } from "@/service/analytics";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
@@ -314,6 +315,15 @@ export const Extraction: React.FC = () => {
     ) as scrapeJobPostRequest;
 
     try {
+      // Track event when user initiates scraping
+      trackEvent("start_scrape", {
+        keyword: formData.keyword.trim(),
+        country: location.countryCode,
+        state: location.stateCode || "(none)",
+        city: location.city || "(none)",
+        max_records: formData.maxRecords || 0,
+      });
+
       const result = await startScraping(scrapeRequest);
       toast.success(`Scraping started! Job ID: ${result.jobId}`);
       // Set flag to show live data dialog on Dashboard
