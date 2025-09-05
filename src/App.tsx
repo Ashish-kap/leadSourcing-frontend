@@ -8,8 +8,8 @@ import { useEffect } from "react";
 import {
   initAnalytics,
   trackPageView,
-  setUserId,
-  setUserProps,
+  // setUserId,
+  // setUserProps,
 } from "@/service/analytics";
 
 const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
