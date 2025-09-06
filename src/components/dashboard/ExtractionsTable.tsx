@@ -276,6 +276,15 @@ export const ExtractionsTable: React.FC = () => {
         });
         // Refetch jobs data to update the table
         refetchJobs();
+      } else if (data.type === "job_no_data_found") {
+        // Clean up real-time progress for completed job
+        setRealtimeProgress((prev) => {
+          const updated = { ...prev };
+          delete updated[data.job.jobId];
+          return updated;
+        });
+        // Refetch jobs data to update the table
+        refetchJobs();
       } else if (data.type === "job_failed") {
         console.log(`❌ Job failed: ${data.job.error?.message}`);
         // Clean up real-time progress for failed job
