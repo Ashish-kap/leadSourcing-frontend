@@ -7,6 +7,7 @@ import Login from "./pages/login";
 import { ProtectedRoute } from "./store/components/ProtectedRoute";
 import Extraction from "./pages/Extraction";
 import NotFound from "./pages/NotFound";
+import Subscription from "./pages/subscription";
 
 const RoutesMain = () => (
   <Routes>
@@ -17,6 +18,7 @@ const RoutesMain = () => (
     <Route element={<ProtectedRoute />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/extraction" element={<Extraction />} />
+      <Route path="/subscription" element={<Subscription />} />
     </Route>
   </Routes>
 );

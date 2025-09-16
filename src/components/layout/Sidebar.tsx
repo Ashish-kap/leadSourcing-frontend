@@ -6,7 +6,7 @@ import {
   // Clock,
   // Bookmark,
   // Settings,
-  // CreditCard,
+  CreditCard,
   // HelpCircle,
   LogOut,
   ChevronLeft,
@@ -28,7 +28,7 @@ const menuItems = [
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   // { icon: Settings, label: "Account Settings", href: "/settings" },
-  // { icon: CreditCard, label: "Billing", href: "/billing" },
+  { icon: CreditCard, label: "Subscription", href: "/subscription" },
   // { icon: HelpCircle, label: "Help & Support", href: "/help" },
 ];
 
