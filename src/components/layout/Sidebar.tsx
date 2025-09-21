@@ -6,7 +6,7 @@ import {
   // Clock,
   // Bookmark,
   // Settings,
-  // CreditCard,
+  CreditCard,
   // HelpCircle,
   LogOut,
   ChevronLeft,
@@ -28,7 +28,7 @@ const menuItems = [
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   // { icon: Settings, label: "Account Settings", href: "/settings" },
-  // { icon: CreditCard, label: "Billing", href: "/billing" },
+  { icon: CreditCard, label: "Subscription", href: "/subscription" },
   // { icon: HelpCircle, label: "Help & Support", href: "/help" },
 ];
 
@@ -60,9 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               <Map className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">
-                LeadHuntr
-              </h1>
+              <h1 className="text-lg font-bold text-foreground">LeadHuntr</h1>
             </div>
           </div>
         )}
@@ -109,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10",
+            "w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer",
             isCollapsed && "justify-center px-3"
           )}
           onClick={handleSubmit}

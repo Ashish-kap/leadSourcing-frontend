@@ -345,12 +345,19 @@ const Signup = () => {
                     className="text-sm text-muted-foreground cursor-pointer"
                   >
                     I agree to the{" "}
-                    <Link to="/terms" className="text-primary hover:underline">
+                    <Link
+                      to="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
                     <Link
                       to="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
                       Privacy Policy
@@ -360,7 +367,7 @@ const Signup = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12"
+                  className="w-full h-12 cursor-pointer"
                   disabled={
                     isSigningUp ||
                     !agreeToTerms ||
@@ -394,7 +401,7 @@ const Signup = () => {
                 <div className="mt-6 grid grid-cols-1 gap-3">
                   <Button
                     variant="outline"
-                    className="h-12"
+                    className="h-12 cursor-pointer"
                     onClick={handleGoogleSignup}
                     disabled={isGoogleLoggingIn}
                   >

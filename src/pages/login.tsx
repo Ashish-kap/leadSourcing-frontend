@@ -352,13 +352,23 @@ const Login = () => {
                 <div className="pt-4 space-y-2">
                   <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
                     By continuing, you agree to our{" "}
-                    <span className="text-primary font-medium hover:underline cursor-pointer">
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary font-medium hover:underline cursor-pointer"
+                    >
                       Terms of Service
-                    </span>{" "}
+                    </a>{" "}
                     and{" "}
-                    <span className="text-primary font-medium hover:underline cursor-pointer">
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary font-medium hover:underline cursor-pointer"
+                    >
                       Privacy Policy
-                    </span>
+                    </a>
                     .
                   </p>
                   <p className="text-xs text-muted-foreground/80">

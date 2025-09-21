@@ -546,6 +546,7 @@ export const ExtractionsTable: React.FC = () => {
                       )
                     )}
                     disabled={isDownloading}
+                    className="cursor-pointer"
                   >
                     <Download
                       className={`h-4 w-4 ${
@@ -566,7 +567,7 @@ export const ExtractionsTable: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   disabled={isDeletingJob}
-                  className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
+                  className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10 cursor-pointer"
                 >
                   {isDeletingJob ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

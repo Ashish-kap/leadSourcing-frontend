@@ -103,4 +103,50 @@ export function callBE(path: string, config?: AxiosRequestConfig) {
   });
 }
 
+// Subscription API types
+export interface CreateSubscriptionPayload {
+  billing: {
+    city: string;
+    country: string;
+    state: string;
+    street: string;
+    zipcode: string;
+  };
+  product_id: string;
+  return_url: string;
+  payment_link: boolean;
+  quantity: number;
+}
+
+export interface CreateSubscriptionResponse {
+  status: string;
+  data: {
+    subscription: {
+      subscription_id: string;
+      recurring_pre_tax_amount: number;
+      client_secret: string;
+      payment_link: string;
+      expires_on: string;
+      customer: {
+        customer_id: string;
+        name: string;
+        email: string;
+      };
+      metadata: Record<string, any>;
+      discount_id: string | null;
+      addons: any[];
+      payment_id: string;
+    };
+  };
+}
+
+// Create subscription function
+export const createSubscription = (
+  payload: CreateSubscriptionPayload
+): Promise<CreateSubscriptionResponse> => {
+  return axiosInstance
+    .post("/dodo-payments/subscriptions", payload)
+    .then((response) => response.data);
+};
+
 export default axiosInstance;

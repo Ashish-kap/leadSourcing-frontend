@@ -82,7 +82,7 @@ export const Header: React.FC = () => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+              className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full cursor-pointer"
             >
               <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                 <AvatarImage src="" alt={userName} />
