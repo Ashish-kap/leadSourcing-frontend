@@ -61,6 +61,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
+import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 
 interface Extraction {
   id: string;
@@ -204,6 +205,11 @@ export const ExtractionsTable: React.FC = () => {
   const [realtimeProgress, setRealtimeProgress] = useState<
     Record<string, number>
   >({});
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [, setSelectedJobForFeedback] = useState<{
+    id: string;
+    keyword: string;
+  } | null>(null);
   const navigate = useNavigate();
 
   const {
@@ -346,6 +352,21 @@ export const ExtractionsTable: React.FC = () => {
       console.error("Delete job error:", error);
       toast.error("Failed to delete extraction. Please try again.");
     }
+  };
+
+  const handleDownloadWithFeedback = (jobId: string, keyword: string) => {
+    // Set the selected job for feedback
+    setSelectedJobForFeedback({ id: jobId, keyword });
+    // Open the feedback modal
+    setIsFeedbackModalOpen(true);
+  };
+
+  const handleFeedbackUpgrade = () => {
+    // Navigate to subscription page
+    navigate("/subscription");
+    // Close the feedback modal
+    setIsFeedbackModalOpen(false);
+    setSelectedJobForFeedback(null);
   };
 
   const columns = useMemo<ColumnDef<Extraction>[]>(
@@ -535,16 +556,22 @@ export const ExtractionsTable: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => (
+                    onClick={() => {
                       trackEvent("download_csv", {
                         job_id: row.original.id,
                         records: row.original.recordsCollected ?? 0,
-                      }),
+                      });
+                      // First download the CSV
                       downloadCsv(
                         row.original.id,
                         `${row.original.keyword}-extraction.csv`
-                      )
-                    )}
+                      );
+                      // Then open feedback modal
+                      handleDownloadWithFeedback(
+                        row.original.id,
+                        row.original.keyword
+                      );
+                    }}
                     disabled={isDownloading}
                     className="cursor-pointer"
                   >
@@ -602,7 +629,12 @@ export const ExtractionsTable: React.FC = () => {
         },
       },
     ],
-    [realtimeProgress, handleDeleteJob, isDeletingJob]
+    [
+      realtimeProgress,
+      handleDeleteJob,
+      isDeletingJob,
+      handleDownloadWithFeedback,
+    ]
   );
 
   const table = useReactTable({
@@ -630,149 +662,166 @@ export const ExtractionsTable: React.FC = () => {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="pb-4">Recent Extractions</CardTitle>
-        {connectionStatus}
-        <div className="flex flex-col sm:flex-row justify-between gap-4  sm:items-center">
-          {/* LEFT: Search & Select grouped */}
-          <div className="flex flex-col sm:flex-row gap-4 flex-1">
-            <div className="relative max-w-sm w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search extractions..."
-                value={globalFilter ?? ""}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                className="pl-10 w-full"
-              />
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="pb-4">Recent Extractions</CardTitle>
+          {connectionStatus}
+          <div className="flex flex-col sm:flex-row justify-between gap-4  sm:items-center">
+            {/* LEFT: Search & Select grouped */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="relative max-w-sm w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search extractions..."
+                  value={globalFilter ?? ""}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
+              <Select
+                value={
+                  (table.getColumn("status")?.getFilterValue() as string) ?? ""
+                }
+                onValueChange={(value) =>
+                  table
+                    .getColumn("status")
+                    ?.setFilterValue(value === "all" ? "" : value)
+                }
+              >
+                <SelectTrigger className="w-full sm:w-40">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="data_not_found">No Data Found</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select
-              value={
-                (table.getColumn("status")?.getFilterValue() as string) ?? ""
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("status")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="w-full sm:w-40">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="data_not_found">No Data Found</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-          {/* RIGHT: Button */}
-          <Button
-            onClick={() => navigate("/extraction")}
-            className="whitespace-nowrap cursor-pointer bg-primary/90 text-primary-foreground shadow-glow"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">New Google Maps Extraction</span>
-            <span className="sm:hidden">New Extraction</span>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {/* Table */}
-        <div className="border border-border rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        className="bg-muted/50 whitespace-nowrap"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} className="hover:bg-muted/50">
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
+            {/* RIGHT: Button */}
+            <Button
+              onClick={() => navigate("/extraction")}
+              className="whitespace-nowrap cursor-pointer bg-primary/90 text-primary-foreground shadow-glow"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">
+                New Google Maps Extraction
+              </span>
+              <span className="sm:hidden">New Extraction</span>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Table */}
+          <div className="border border-border rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          className="bg-muted/50 whitespace-nowrap"
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center text-muted-foreground"
-                    >
-                      No results found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id} className="hover:bg-muted/50">
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className="whitespace-nowrap"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        No results found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-        </div>
 
-        {/* Pagination */}
-        <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-sm text-muted-foreground text-center sm:text-left">
-            Showing{" "}
-            {table.getState().pagination.pageIndex *
-              table.getState().pagination.pageSize +
-              1}{" "}
-            to{" "}
-            {Math.min(
-              (table.getState().pagination.pageIndex + 1) *
-                table.getState().pagination.pageSize,
-              table.getFilteredRowModel().rows.length
-            )}{" "}
-            of {table.getFilteredRowModel().rows.length} results
+          {/* Pagination */}
+          <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-muted-foreground text-center sm:text-left">
+              Showing{" "}
+              {table.getState().pagination.pageIndex *
+                table.getState().pagination.pageSize +
+                1}{" "}
+              to{" "}
+              {Math.min(
+                (table.getState().pagination.pageIndex + 1) *
+                  table.getState().pagination.pageSize,
+                table.getFilteredRowModel().rows.length
+              )}{" "}
+              of {table.getFilteredRowModel().rows.length} results
+            </div>
+            <div className="flex items-center justify-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="flex items-center space-x-1"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Previous</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="flex items-center space-x-1"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center justify-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="flex items-center space-x-1"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Previous</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="flex items-center space-x-1"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => {
+          setIsFeedbackModalOpen(false);
+          setSelectedJobForFeedback(null);
+        }}
+        onUpgrade={handleFeedbackUpgrade}
+      />
+    </>
   );
 };
