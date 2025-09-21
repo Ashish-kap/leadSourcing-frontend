@@ -11,4 +11,25 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          ui: [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-select",
+            "@radix-ui/react-checkbox",
+          ],
+          utils: ["axios", "clsx", "tailwind-merge"],
+        },
+      },
+    },
+    target: "esnext",
+    minify: "esbuild",
+    chunkSizeWarningLimit: 1000,
+  },
+  define: {
+    global: "globalThis",
+  },
 });
