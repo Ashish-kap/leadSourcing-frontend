@@ -8,10 +8,14 @@ import { ProtectedRoute } from "./store/components/ProtectedRoute";
 import Extraction from "./pages/Extraction";
 import NotFound from "./pages/NotFound";
 import Subscription from "./pages/subscription";
+import Privacy from "./pages/privacy";
+import TermsOfService from "./pages/TermsOfService";
 
 const RoutesMain = () => (
   <Routes>
     <Route path="/home" element={<LandingPage />} />
+    <Route path="/privacy" element={<Privacy />} />
+    <Route path="/terms" element={<TermsOfService />} />
     <Route path="/login" element={<Login />} />
     {/* <Route path="/signup" element={<Signup />} /> */}
     <Route path="*" element={<NotFound />} />

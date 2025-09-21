@@ -60,9 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               <Map className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">
-                LeadHuntr
-              </h1>
+              <h1 className="text-lg font-bold text-foreground">LeadHuntr</h1>
             </div>
           </div>
         )}
@@ -109,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10",
+            "w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer",
             isCollapsed && "justify-center px-3"
           )}
           onClick={handleSubmit}

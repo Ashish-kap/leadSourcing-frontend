@@ -68,6 +68,7 @@ export const Extraction: React.FC = () => {
     },
     reviewsWithinLastYears: null as number | null,
     isExtractEmail: true,
+    isValidate: false,
   });
 
   const [location, setLocation] = useState<LocationState>({
@@ -164,10 +165,18 @@ export const Extraction: React.FC = () => {
     }));
   };
 
-  const handleCheckboxChange = (checked: boolean | string) => {
+  const handleEmailCheckboxChange = (checked: boolean | string) => {
     setFormData((prev) => ({
       ...prev,
       isExtractEmail: checked === true,
+      isValidate: checked === true ? prev.isValidate : false,
+    }));
+  };
+
+  const handleValidateCheckboxChange = (checked: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      isValidate: checked === true,
     }));
   };
 
@@ -255,6 +264,7 @@ export const Extraction: React.FC = () => {
           : undefined,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
       isExtractEmail: formData.isExtractEmail,
+      isValidate: formData.isValidate,
     };
 
     const scrapeRequest = Object.fromEntries(
@@ -306,7 +316,7 @@ export const Extraction: React.FC = () => {
         }
 
         // Boolean fields
-        if (key === "isExtractEmail") {
+        if (key === "isExtractEmail" || key === "isValidate") {
           return typeof value === "boolean";
         }
 
@@ -322,6 +332,8 @@ export const Extraction: React.FC = () => {
         state: location.stateCode || "(none)",
         city: location.city || "(none)",
         max_records: formData.maxRecords || 0,
+        extract_email: formData.isExtractEmail,
+        validate_data: formData.isValidate,
       });
 
       const result = await startScraping(scrapeRequest);
@@ -348,6 +360,7 @@ export const Extraction: React.FC = () => {
       },
       reviewsWithinLastYears: null,
       isExtractEmail: true,
+      isValidate: false, // Always start as false since it depends on email extraction
     });
     setLocation({
       countryCode: "",
@@ -695,13 +708,13 @@ export const Extraction: React.FC = () => {
                     </div> */}
                     </div>
 
-                    {/* Email Extraction Option */}
-                    <div className="space-y-2">
+                    {/* Email Extraction & Validation Options */}
+                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8">
                       <div className="flex items-center space-x-3">
                         <Checkbox
                           id="isExtractEmail"
                           checked={formData.isExtractEmail}
-                          onCheckedChange={handleCheckboxChange}
+                          onCheckedChange={handleEmailCheckboxChange}
                         />
                         <div className="flex items-center space-x-2">
                           <Label
@@ -725,6 +738,44 @@ export const Extraction: React.FC = () => {
                           </Tooltip>
                         </div>
                       </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Checkbox
+                          id="isValidate"
+                          checked={formData.isValidate}
+                          onCheckedChange={handleValidateCheckboxChange}
+                          disabled={!formData.isExtractEmail}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="isValidate"
+                            className={`cursor-pointer ${
+                              !formData.isExtractEmail
+                                ? "text-muted-foreground"
+                                : ""
+                            }`}
+                          >
+                            Validate Emails
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Enable this option to validate and verify the
+                                extracted email addresses. This may increase
+                                processing time but ensures higher data quality.
+                                {!formData.isExtractEmail && (
+                                  <span className="block mt-2 text-yellow-600">
+                                    ⚠️ Requires "Scrape Email" to be enabled
+                                  </span>
+                                )}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -732,7 +783,7 @@ export const Extraction: React.FC = () => {
                       <Button
                         type="submit"
                         disabled={isScraping}
-                        className="flex-1"
+                        className="flex-1 cursor-pointer"
                       >
                         {isScraping ? (
                           <>
@@ -748,6 +799,7 @@ export const Extraction: React.FC = () => {
                         type="button"
                         variant="outline"
                         onClick={handleReset}
+                        className="cursor-pointer"
                       >
                         <RotateCcw className="mr-2 h-4 w-4" />
                         Reset

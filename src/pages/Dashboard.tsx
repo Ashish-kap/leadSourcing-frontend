@@ -112,12 +112,12 @@ export const Dashboard: React.FC = () => {
                       {userData?.extractionStats.completedJobs.value || 0}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  {/* <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Success Rate</span>
                     <span className="text-foreground">
                       {userData?.extractionStats.successRate.value || 0}%
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>

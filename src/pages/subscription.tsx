@@ -11,25 +11,87 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
-import { initializePaddle } from "@paddle/paddle-js";
+import { toast } from "sonner";
+import {
+  BillingModal,
+  type BillingDetails,
+} from "@/components/billing/BillingModal";
+import {
+  createSubscription,
+  type CreateSubscriptionPayload,
+} from "@/service/api";
+
 const Subscription: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
-  const handleGetStarted = async () => {
-    try {
-      const instance = await initializePaddle({
-        environment: import.meta.env.MODE === "production" ? "production" : "sandbox",
-        token: import.meta.env.VITE_PADDLE_TOKEN,
-        debug: true,
-      });
+  const [isBillingModalOpen, setIsBillingModalOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-      if (instance) {
-        await instance.Checkout.open({
-          items: [{ priceId: "pro_01k51ya88n2wpw890tpnathb2f", quantity: 1 }],
-        });
+  const handleGetStarted = async () => {
+    setIsBillingModalOpen(true);
+  };
+
+  const handleBillingSubmit = async (billingData: BillingDetails) => {
+    setIsLoading(true);
+    try {
+      // Get environment variables
+      const productId = import.meta.env.VITE_PRODUCT_ID;
+      const returnUrl = import.meta.env.VITE_RETURN_URL;
+
+      if (!productId || !returnUrl) {
+        throw new Error(
+          "Missing required environment variables: VITE_PRODUCT_ID or VITE_RETURN_URL"
+        );
       }
-    } catch (err) {
-      console.error("Paddle initialization or checkout failed", err);
+
+      // Prepare API payload
+      const payload: CreateSubscriptionPayload = {
+        billing: {
+          city: billingData.city,
+          country: billingData.country,
+          state: billingData.state,
+          street: billingData.street,
+          zipcode: billingData.zipcode,
+        },
+        product_id: productId,
+        return_url: returnUrl,
+        payment_link: true,
+        quantity: 1,
+      };
+
+      console.log("Creating subscription with payload:", payload);
+
+      // Call the subscription API
+      const response = await createSubscription(payload);
+
+      console.log("Subscription created successfully:", response);
+
+      // Check if response is successful and has payment link
+      if (
+        response.status === "success" &&
+        response.data?.subscription?.payment_link
+      ) {
+        // Close modal first
+        setIsBillingModalOpen(false);
+
+        // Redirect to payment link
+        window.location.href = response.data.subscription.payment_link;
+      } else {
+        throw new Error("Invalid response from subscription API");
+      }
+
+      // You can add success notification here
+      toast.success("Redirecting to payment...");
+    } catch (error) {
+      console.error("Payment processing failed:", error);
+      // You can add error notification here
+      toast.error("Payment processing failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleBillingModalClose = () => {
+    setIsBillingModalOpen(false);
   };
 
   const pricingPlans = [
@@ -78,15 +140,6 @@ const Subscription: React.FC = () => {
 
         <main className="flex-1 overflow-auto p-4 sm:p-6">
           <div className="max-w-5xl mx-auto">
-            {/* Page Header */}
-            {/* <div className="mb-8">
-              <h1 className="text-xl sm:text-xl">Upgrade your plan</h1>
-              <p className="text-muted-foreground mt-2">
-                Choose a plan that fits your workflow. Upgrade anytime.
-              </p>
-            </div> */}
-
-            {/* Pricing Section */}
             <section className="py-6">
               <div className="text-center mb-10">
                 <h2 className="text-2xl md:text-3xl font-semibold mb-3">
@@ -157,6 +210,13 @@ const Subscription: React.FC = () => {
           </div>
         </main>
       </div>
+
+      <BillingModal
+        open={isBillingModalOpen}
+        onOpenChange={handleBillingModalClose}
+        onSubmit={handleBillingSubmit}
+        isLoading={isLoading}
+      />
     </div>
   );
 };
