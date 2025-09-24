@@ -28,12 +28,12 @@ const Privacy = () => {
                   use, and protect your personal information when you use our
                   website{" "}
                   <a
-                    href="https://CazaLead.vercel.app"
+                    href="https://cazalead.com"
                     className="text-primary hover:underline font-medium"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    https://CazaLead.vercel.app
+                    https://cazalead.com
                   </a>{" "}
                   (the "Site").
                 </p>
