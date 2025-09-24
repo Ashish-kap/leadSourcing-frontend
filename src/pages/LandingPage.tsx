@@ -147,7 +147,7 @@ const LandingPage = () => {
       company: "Manifest Solutions Pvt Ltd",
       image: "/api/placeholder/64/64",
       rating: 5,
-      text: "LeadHuntr helped us generate 300% more leads in our target market. The data quality is exceptional!",
+      text: "CazaLead helped us generate 300% more leads in our target market. The data quality is exceptional!",
     },
     {
       name: "Siddharth Jaiswal",
@@ -335,7 +335,7 @@ const LandingPage = () => {
               What Our Customers Say
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join thousands of businesses growing with LeadHuntr
+              Join thousands of businesses growing with CazaLead
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -383,7 +383,7 @@ const LandingPage = () => {
             Ready to Supercharge Your Lead Generation?
           </h2>
           <p className="text-xl mb-8 text-white/90">
-            Join thousands of businesses using LeadHuntr to grow their customer
+            Join thousands of businesses using CazaLead to grow their customer
             base
           </p>
           <Button
@@ -415,7 +415,7 @@ const LandingPage = () => {
                   onClick={() => navigate("/")}
                   className="text-xl cursor-pointer font-bold gradient-text"
                 >
-                  LeadHuntr
+                  CazaLead
                 </span>
               </div>
               <p className="text-muted-foreground">
@@ -499,7 +499,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 LeadHuntr. All rights reserved.</p>
+            <p>&copy; 2024 CazaLead. All rights reserved.</p>
           </div>
         </div>
       </footer>
