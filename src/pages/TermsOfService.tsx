@@ -26,12 +26,12 @@ const TermsOfService = () => {
                   Welcome to CazaLead! These Terms of Service ("Terms") govern
                   your access to and use of our website located at{" "}
                   <a
-                    href="https://CazaLead.vercel.app"
+                    href="https://cazalead.com"
                     className="text-primary hover:underline font-medium"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    https://CazaLead.vercel.app
+                    https://cazalead.com
                   </a>{" "}
                   (the "Site") and any related services provided by CazaLead
                   ("we", "our", or "us").
