@@ -100,7 +100,7 @@ const Login = () => {
                 onClick={() => navigate("/home")}
                 className="text-2xl cursor-pointer font-bold gradient-text"
               >
-                LeadHuntr
+                CazaLead
               </span>
             </div>
             <h1 className="text-3xl font-bold">Welcome back</h1>
@@ -272,7 +272,7 @@ const Login = () => {
                     onClick={() => navigate("/home")}
                     className="text-4xl cursor-pointer font-bold gradient-text tracking-tight"
                   >
-                    LeadHuntr
+                    CazaLead
                   </span>
                 </div>
                 <h1 className="text-2xl font-bold mb-2 pb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
@@ -391,7 +391,7 @@ const Login = () => {
             Extract Business Data Like Never Before
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Join thousands of businesses using LeadHuntr to supercharge their
+            Join thousands of businesses using CazaLead to supercharge their
             lead generation and market research.
           </p>
           <div className="flex items-center justify-center space-x-8 text-white/80">

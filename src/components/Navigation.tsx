@@ -53,7 +53,7 @@ const Navigation = () => {
               onClick={() => navigate("/")}
               className="text-xl font-bold gradient-text cursor-pointer"
             >
-              LeadHuntr
+              CazaLead
             </span>
           </Link>
 
@@ -82,7 +82,9 @@ const Navigation = () => {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center  space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="cursor-pointer">Login</Button>
+              <Button variant="ghost" className="cursor-pointer">
+                Login
+              </Button>
             </Link>
             <Link to="/login">
               <Button className="cursor-pointer">Get Started</Button>

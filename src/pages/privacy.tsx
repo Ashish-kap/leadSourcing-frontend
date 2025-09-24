@@ -23,17 +23,17 @@ const Privacy = () => {
               {/* Introduction */}
               <div className="mb-8 space-y-4 text-sm sm:text-base leading-relaxed">
                 <p className="text-foreground">
-                  Leadhuntr ("we", "our", or "us") is committed to protecting
+                  CazaLead ("we", "our", or "us") is committed to protecting
                   your privacy. This Privacy Policy explains how we collect,
                   use, and protect your personal information when you use our
                   website{" "}
                   <a
-                    href="https://leadhuntr.vercel.app"
+                    href="https://CazaLead.vercel.app"
                     className="text-primary hover:underline font-medium"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    https://leadhuntr.vercel.app
+                    https://CazaLead.vercel.app
                   </a>{" "}
                   (the "Site").
                 </p>

@@ -60,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
               <Map className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground">LeadHuntr</h1>
+              <h1 className="text-lg font-bold text-foreground">CazaLead</h1>
             </div>
           </div>
         )}

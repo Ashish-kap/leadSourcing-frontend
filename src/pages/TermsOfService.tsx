@@ -23,17 +23,17 @@ const TermsOfService = () => {
               {/* Introduction */}
               <div className="mb-8 space-y-4 text-sm sm:text-base leading-relaxed">
                 <p className="text-foreground">
-                  Welcome to Leadhuntr! These Terms of Service ("Terms") govern
+                  Welcome to CazaLead! These Terms of Service ("Terms") govern
                   your access to and use of our website located at{" "}
                   <a
-                    href="https://leadhuntr.vercel.app"
+                    href="https://CazaLead.vercel.app"
                     className="text-primary hover:underline font-medium"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    https://leadhuntr.vercel.app
+                    https://CazaLead.vercel.app
                   </a>{" "}
-                  (the "Site") and any related services provided by Leadhuntr
+                  (the "Site") and any related services provided by CazaLead
                   ("we", "our", or "us").
                 </p>
                 <p className="text-foreground">
@@ -112,7 +112,7 @@ const TermsOfService = () => {
                   <div className="space-y-3 text-sm sm:text-base text-foreground leading-relaxed">
                     <p>
                       All content on the Site — including text, code, graphics,
-                      logos, and software — is the property of Leadhuntr or its
+                      logos, and software — is the property of CazaLead or its
                       licensors and is protected by intellectual property laws.
                     </p>
                     <p>
@@ -192,8 +192,8 @@ const TermsOfService = () => {
                   </h2>
                   <div className="space-y-3 text-sm sm:text-base text-foreground leading-relaxed">
                     <p>
-                      To the fullest extent permitted by law, Leadhuntr shall
-                      not be liable for any indirect, incidental, special,
+                      To the fullest extent permitted by law, CazaLead shall not
+                      be liable for any indirect, incidental, special,
                       consequential, or punitive damages, or any loss of data,
                       use, or profits, arising from your use of the Site.
                     </p>
@@ -222,7 +222,7 @@ const TermsOfService = () => {
                     <p>
                       These Terms shall be governed by and interpreted in
                       accordance with the laws of the jurisdiction in which
-                      Leadhuntr operates, without regard to its conflict of law
+                      CazaLead operates, without regard to its conflict of law
                       principles.
                     </p>
                   </div>

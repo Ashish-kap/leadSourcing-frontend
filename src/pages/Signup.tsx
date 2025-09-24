@@ -186,7 +186,7 @@ const Signup = () => {
                 onClick={() => navigate("/home")}
                 className="text-2xl cursor-pointer font-bold gradient-text"
               >
-                LeadHuntr
+                CazaLead
               </span>
             </div>
             <h1 className="text-3xl font-bold">Create your account</h1>

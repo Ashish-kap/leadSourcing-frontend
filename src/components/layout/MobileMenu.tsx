@@ -73,7 +73,7 @@ export const MobileMenu: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-foreground">
-                    LeadHuntr
+                    CazaLead
                   </h1>
                 </div>
               </div>
