@@ -240,10 +240,10 @@ const TermsOfService = () => {
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
-                        href="mailto:srigbok@gmail.com"
+                        href="mailto:ask@cazalead.com"
                         className="text-primary hover:underline font-medium"
                       >
-                        srigbok@gmail.com
+                        ask@cazalead.com
                       </a>
                     </p>
                   </div>

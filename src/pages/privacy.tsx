@@ -233,7 +233,7 @@ const Privacy = () => {
                   please contact us at:
                 </p>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  <strong>Email:</strong> srigbok@gmail.com
+                  <strong>Email:</strong> ask@cazalead.com
                 </p>
               </section>
             </CardContent>
