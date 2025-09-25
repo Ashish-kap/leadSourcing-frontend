@@ -121,7 +121,7 @@ const Subscription: React.FC = () => {
         "All export formats",
         "Priority support",
         "Advanced filtering",
-        "API access",
+        // "API access",
         "Bulk processing",
       ],
       popular: true,
