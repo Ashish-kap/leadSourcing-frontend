@@ -13,7 +13,6 @@ import Subscription from "./pages/subscription";
 
 const RoutesMain = () => (
   <Routes>
-    {/* <Route path="/home" element={<LandingPage />} /> */}
     {/* Privacy and terms are handled by Vercel redirects in vercel.json */}
     <Route path="/login" element={<Login />} />
     {/* <Route path="/signup" element={<Signup />} /> */}

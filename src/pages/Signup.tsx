@@ -177,13 +177,13 @@ const Signup = () => {
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
               <div
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/")}
                 className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
               >
                 <MapPin className="h-6 w-6 text-white" />
               </div>
               <span
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/")}
                 className="text-2xl cursor-pointer font-bold gradient-text"
               >
                 CazaLead

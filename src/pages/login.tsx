@@ -263,13 +263,13 @@ const Login = () => {
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-3 mb-8">
                   <div
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate("/")}
                     className="w-12 h-12 cursor-pointer bg-gradient-to-r from-primary to-primary-glow rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
                     <MapPin className="h-7 w-7 text-white" />
                   </div>
                   <span
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate("/")}
                     className="text-4xl cursor-pointer font-bold gradient-text tracking-tight"
                   >
                     CazaLead
