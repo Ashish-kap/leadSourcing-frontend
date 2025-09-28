@@ -173,15 +173,13 @@ const LandingPage = () => {
       <section className="hero-gradient pt-16 pb-20 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Extract Google Maps Business Data{" "}
-              <span className="text-yellow-300">
-                Before Your Competitors Do
-              </span>
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
+              <span className="text-white">Google Maps </span>
+              <span className="text-yellow-300">Lead Finder</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-white/90">
-              Powerful Google Maps scraping tool for lead generation, market
-              research, and business intelligence
+              Access complete business profiles with contacts and verified
+              emails, organized for sales, marketing, and research
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -189,7 +187,7 @@ const LandingPage = () => {
                 className="bg-white text-primary cursor-pointer hover:bg-white/90 px-6 sm:px-8 md:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold w-full sm:w-auto sm:min-w-[200px]"
                 onClick={handleStartTrial}
               >
-                Start Free Trial{" "}
+                Start Extracting Leads
                 <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
               {/* <Button
@@ -511,7 +509,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 CazaLead. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} CazaLead. All rights reserved.</p>
           </div>
         </div>
       </footer>
