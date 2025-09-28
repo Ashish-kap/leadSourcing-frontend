@@ -4,5 +4,17 @@
       "source": "/((?!api|assets|_next/static|_next/image|favicon.ico|vite.svg).*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/privacy",
+      "destination": "https://cazalead.com/privacy",
+      "permanent": false
+    },
+    {
+      "source": "/terms",
+      "destination": "https://cazalead.com/terms",
+      "permanent": false
+    }
   ]
 }

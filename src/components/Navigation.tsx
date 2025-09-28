@@ -8,7 +8,7 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const isHomePage = location.pathname === "/home";
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
