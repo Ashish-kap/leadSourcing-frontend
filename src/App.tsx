@@ -11,6 +11,7 @@ import {
   // setUserId,
   // setUserProps,
 } from "@/service/analytics";
+import { Analytics } from "@vercel/analytics/react";
 
 const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
 
@@ -39,6 +40,7 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
+        <Analytics />
         <GAListener />
         <Toaster />
         <RoutesMain />
