@@ -16,12 +16,12 @@ const RoutesMain = () => (
     {/* Privacy and terms are handled by Vercel redirects in vercel.json */}
     <Route path="/login" element={<Login />} />
     {/* <Route path="/signup" element={<Signup />} /> */}
-    <Route path="*" element={<NotFound />} />
     <Route element={<ProtectedRoute />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/extraction" element={<Extraction />} />
       <Route path="/subscription" element={<Subscription />} />
     </Route>
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
 
