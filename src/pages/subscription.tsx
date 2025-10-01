@@ -20,6 +20,7 @@ import {
   createSubscription,
   type CreateSubscriptionPayload,
 } from "@/service/api";
+import { CountdownTimer } from "@/components/CounterTimer";
 
 const Subscription: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
@@ -110,7 +111,7 @@ const Subscription: React.FC = () => {
     //   popular: false,
     // },
     {
-      name: "Professional",
+      name: "Business",
       price: "$9",
       oldPrice: "$29",
       period: "/month",
@@ -169,6 +170,7 @@ const Subscription: React.FC = () => {
                       <CardTitle className="text-xl sm:text-2xl">
                         {plan.name}
                       </CardTitle>
+
                       <div className="mt-4 flex items-center justify-center gap-3">
                         {(plan as any).oldPrice ? (
                           <span className="text-lg sm:text-xl text-muted-foreground line-through">
@@ -193,8 +195,16 @@ const Subscription: React.FC = () => {
                           </li>
                         ))}
                       </ul>
+
+                      <>
+                        {plan.popular && (
+                          <div className="mt-6">
+                            <CountdownTimer />
+                          </div>
+                        )}
+                      </>
                       <Button
-                        className={`w-full mt-6 cursor-pointer ${
+                        className={`w-full mt-2 cursor-pointer ${
                           plan.popular ? "bg-primary" : ""
                         }`}
                         variant={plan.popular ? "default" : "outline"}
