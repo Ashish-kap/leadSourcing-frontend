@@ -25,27 +25,41 @@ export const handleApiError = (error: FetchBaseQueryError | undefined) => {
     }
 
     const errorData = error?.data as ApiError;
+
+    // Handle 402 Payment Required with upgrade button
+    if (error.status === 402) {
+      toast("Upgrade Required!", {
+        description: errorData.message,
+        action: {
+          label: "Upgrade Now",
+          onClick: () => {
+            window.location.href = "/subscription";
+          },
+        },
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        },
+        className: "toast-action-left",
+        duration: 10000, // Show for 10 seconds
+        actionButtonStyle: {
+          backgroundColor: "#3b82f6", // Professional blue
+          color: "white",
+          border: "none",
+          borderRadius: "6px",
+          padding: "8px 16px",
+          fontSize: "14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        },
+      });
+      return;
+    }
+
     handleValidationErrors(errorData);
-    // Handle different error status codes
-    // switch (error.status) {
-    //   case 400:
-    //     handleValidationErrors(errorData);
-    //     break;
-    //   case 401:
-    //     toast.error("Authentication required. Please log in.");
-    //     break;
-    //   case 403:
-    //     toast.error("Access denied. You do not have permission.");
-    //     break;
-    //   case 404:
-    //     toast.error("Resource not found.");
-    //     break;
-    //   case 500:
-    //     toast.error("Server error. Please try again later.");
-    //     break;
-    //   default:
-    //     toast.error(errorData?.detail || "An unexpected error occurred.");
-    // }
   } else {
     toast.error("An unexpected error occurred.");
   }
@@ -70,9 +84,6 @@ export const handleApiError = (error: FetchBaseQueryError | undefined) => {
 //     toast.error("Validation error occurred.");
 //   }
 // };
-
-
-
 
 const handleValidationErrors = (errorData: ApiError) => {
   // First priority: show the message field if it exists
@@ -114,7 +125,6 @@ const handleValidationErrors = (errorData: ApiError) => {
     toast.error("Validation error occurred.");
   }
 };
-
 
 // Hook for handling RTK Query errors in components
 export const useErrorHandler = () => {

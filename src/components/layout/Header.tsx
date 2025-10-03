@@ -1,10 +1,20 @@
 import React from "react";
-import { Bell, User } from "lucide-react";
+import {
+  // Bell,
+  // User,
+  // ChevronDown,
+  // CreditCard,
+  LogOut,
+  Sparkles,
+  BadgeCheck,
+  Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -13,10 +23,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Badge } from "@/components/ui/badge";
 import { MobileMenu } from "@/components/layout/MobileMenu";
-import { useGetCurrentUserQuery } from "@/store/api/authApi";
+import { useAuth } from "@/store/hooks/useAuth";
+import { toast } from "sonner";
 
 export const Header: React.FC = () => {
-  const { data: userData } = useGetCurrentUserQuery();
+  const { user, logout, isLoading: isLoggingOut } = useAuth();
 
   // Helper function to get user initials
   const getUserInitials = (name: string) => {
@@ -27,9 +38,18 @@ export const Header: React.FC = () => {
       .slice(0, 2);
   };
 
-  const userName = userData?.user?.name || "User";
-  const userEmail = userData?.user?.emailID || "";
+  const userName = user?.user?.name || "User";
+  const userEmail = user?.user?.emailID || "";
   const userInitials = getUserInitials(userName);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logout Successfully!");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <header className="h-16 bg-card border-b border-border px-4 sm:px-6 flex items-center justify-between">
@@ -79,40 +99,80 @@ export const Header: React.FC = () => {
 
         {/* User Menu */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button
               variant="ghost"
-              className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full cursor-pointer"
+              className="gap-2 px-0 h-8 w-auto sm:h-10 cursor-pointer"
+              type="button"
             >
-              <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+              <Avatar className="size-8 cursor-pointer rounded-lg">
                 <AvatarImage src="" alt={userName} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm">
+                <AvatarFallback className="rounded-lg bg-primary text-primary-foreground text-xs">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
+              {/* <div className="truncate hidden sm:block">{userName}</div> */}
+              {/* <ChevronDown className="h-4 w-4" /> */}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userName}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {userEmail}
-                </p>
+          <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar className="size-8 rounded-lg">
+                  <AvatarImage src="" alt={userName} />
+                  <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{userName}</span>
+                  <span className="text-muted-foreground truncate text-xs">
+                    {userEmail}
+                  </span>
+                </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell className="mr-2 h-4 w-4" />
-              <span>Notifications</span>
-            </DropdownMenuItem>
+            {user?.user?.plan !== "business" && (
+              <>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Upgrade to Business
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </>
+            )}
+
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <BadgeCheck className="mr-2 h-4 w-4" />
+                <span className="text-muted-foreground">Current Plan</span>
+                <span className="font-medium text-primary capitalize">
+                  {user?.user.plan || "free"}
+                </span>
+              </DropdownMenuItem>
+              {/* <DropdownMenuItem
+                className=" cursor-pointer"
+                onClick={() => (window.location.href = "/subscription")}
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                Billing
+              </DropdownMenuItem> */}
+              <DropdownMenuItem>
+                <Settings className="mr-2 cursor-pointer h-4 w-4" />
+                Account
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <span>Log out</span>
+            <DropdownMenuItem
+              className="text-red-600 cursor-pointer"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              <LogOut className="mr-2 h-4 w-4 text-red-600" />
+              {isLoggingOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

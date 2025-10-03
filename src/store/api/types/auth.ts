@@ -1,4 +1,18 @@
 export interface User {
+  subscription: {
+    status:
+      | "pending"
+      | "active"
+      | "on_hold"
+      | "cancelled"
+      | "failed"
+      | "expired"
+      | null;
+    subscriptionId: string | null;
+    nextBillingDate: string | null;
+    previousBillingDate: string | null;
+    paymentFrequencyInterval: string | null;
+  };
   credits: {
     total: number;
     used: number;
@@ -9,6 +23,9 @@ export interface User {
   name: string;
   role: string;
   plan: string;
+  authProvider?: string;
+  googleId?: string;
+  photo?: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;

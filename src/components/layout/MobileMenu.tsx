@@ -5,7 +5,7 @@ import {
   Plus,
   // Clock,
   // Bookmark,
-  // Settings,
+  Settings,
   CreditCard,
   // HelpCircle,
   LogOut,
@@ -23,14 +23,15 @@ const menuItems = [
   { icon: Plus, label: "New Extraction", href: "/extraction" },
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
-  // { icon: Settings, label: "Account Settings", href: "/settings" },
   { icon: CreditCard, label: "Subscription", href: "/subscription" },
+  { icon: Settings, label: "Account", href: "/account" },
+
   // { icon: HelpCircle, label: "Help & Support", href: "/help" },
 ];
 
 export const MobileMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout, isLoggingOut } = useAuth();
+  const { user, logout, isLoggingOut } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,24 +90,32 @@ export const MobileMenu: React.FC = () => {
 
             {/* Navigation */}
             <nav className="p-2 space-y-1">
-              {menuItems.map((item) => (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      isActive &&
-                        "bg-primary text-primary-foreground shadow-glow"
-                    )
+              {menuItems
+                .filter((item) => {
+                  // Show Subscription only for free plan users
+                  if (item.href === "/subscription") {
+                    return user?.user?.plan === "free";
                   }
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </NavLink>
-              ))}
+                  return true;
+                })
+                .map((item) => (
+                  <NavLink
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        isActive &&
+                          "bg-primary text-primary-foreground shadow-glow"
+                      )
+                    }
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </NavLink>
+                ))}
             </nav>
 
             {/* Logout */}
