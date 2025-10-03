@@ -8,8 +8,27 @@ import { ProtectedRoute } from "./store/components/ProtectedRoute";
 import Extraction from "./pages/Extraction";
 import NotFound from "./pages/NotFound";
 import Subscription from "./pages/subscription";
+import Account from "./pages/Account";
 // import Privacy from "./pages/privacy";
 // import TermsOfService from "./pages/TermsOfService";
+import { useAuth } from "./store/hooks/useAuth";
+
+// Component to handle subscription routing based on user plan
+const SubscriptionRouter = () => {
+  const { user } = useAuth();
+
+  // Check if user has an active subscription
+  const hasActiveSubscription =
+    user?.user?.plan === "business" ||
+    user?.user?.plan === "professional" ||
+    user?.user?.plan === "premium";
+
+  if (hasActiveSubscription) {
+    return <Account />;
+  }
+
+  return <Subscription />;
+};
 
 const RoutesMain = () => (
   <Routes>
@@ -20,6 +39,7 @@ const RoutesMain = () => (
       <Route path="/" element={<Dashboard />} />
       <Route path="/extraction" element={<Extraction />} />
       <Route path="/subscription" element={<Subscription />} />
+      <Route path="/account" element={<Account />} />
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>
