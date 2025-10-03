@@ -11,24 +11,8 @@ import Subscription from "./pages/subscription";
 import Account from "./pages/Account";
 // import Privacy from "./pages/privacy";
 // import TermsOfService from "./pages/TermsOfService";
-import { useAuth } from "./store/hooks/useAuth";
 
-// Component to handle subscription routing based on user plan
-const SubscriptionRouter = () => {
-  const { user } = useAuth();
 
-  // Check if user has an active subscription
-  const hasActiveSubscription =
-    user?.user?.plan === "business" ||
-    user?.user?.plan === "professional" ||
-    user?.user?.plan === "premium";
-
-  if (hasActiveSubscription) {
-    return <Account />;
-  }
-
-  return <Subscription />;
-};
 
 const RoutesMain = () => (
   <Routes>
