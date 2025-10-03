@@ -107,8 +107,8 @@ const LandingPage = () => {
     },
     {
       name: "Professional",
-      price: "$9",
-      oldPrice: "$29",
+      price: "$20",
+      oldPrice: "$50",
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
