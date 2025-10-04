@@ -2,24 +2,25 @@ import React, { useState, useEffect } from "react";
 import { Zap } from "lucide-react";
 
 const OFFERS = [
-  "Early Bird – Save 40%",
-  "Pro Advantage – Limited Deal",
-  "Launch Special – First 100",
-  "Kickstart Plan – Save Big",
-  "Starter Boost – Discount Deal",
-  "Exclusive – Unlock Premium Now",
-  "Founders Special – Lifetime Save",
-  "Scale Saver – Pay Less",
-  "Premium Unlock – Limited Offer",
-  "Deal of Month – Save 30%",
-  "Flash Sale – Ending Soon",
-  "Power Pack – Save Now",
-  "One-Time – Lock Your Price",
+  "Early Bird",
+  "Pro Deal",
+  "Launch Offer",
+  "Kickstart Save",
+  "Starter Discount",
+  "Exclusive Access",
+  "Founders Save",
+  "Scale Saver",
+  "Premium Offer",
+  "Monthly Deal",
+  "Flash Sale",
+  "Power Pack",
 ];
 
 const COUNTDOWN_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 const PAUSE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const DAILY_CYCLE = 24 * 60 * 60 * 1000; // 24 hours total cycle
+const BLOCK_DURATION = COUNTDOWN_DURATION + PAUSE_DURATION; // 3h 15m per block
+const REFERENCE_START_UTC = Date.UTC(2025, 0, 1, 12, 0, 0); // Fixed anchor at 12:00 UTC
 
 interface TimerState {
   currentCycleStart: number; // When current 24-hour cycle started
@@ -28,10 +29,10 @@ interface TimerState {
   currentBlockIndex: number; // Track which block we're currently in
 }
 
-// Helper function to calculate current phase
-const getCurrentPhase = (now: number, cycleStart: number) => {
+// Helper function to calculate current phase using fixed UTC anchor
+const getCurrentPhase = (now: number, _cycleStart: number) => {
   // Safety check for invalid inputs
-  if (!now || !cycleStart || isNaN(now) || isNaN(cycleStart)) {
+  if (!now || isNaN(now)) {
     return {
       phase: "countdown",
       timeLeft: COUNTDOWN_DURATION,
@@ -39,28 +40,23 @@ const getCurrentPhase = (now: number, cycleStart: number) => {
     };
   }
 
-  const timeInCycle = (now - cycleStart) % DAILY_CYCLE;
-
-  // Calculate which 3-hour block we're in (including 15-min breaks)
-  const blockDuration = COUNTDOWN_DURATION + PAUSE_DURATION; // 3h 15min
-  const blockIndex = Math.floor(timeInCycle / blockDuration);
-  const timeInBlock = timeInCycle % blockDuration;
+  const elapsed = now - REFERENCE_START_UTC;
+  const timeInBlock =
+    ((elapsed % BLOCK_DURATION) + BLOCK_DURATION) % BLOCK_DURATION;
+  const blockIndex = Math.floor(elapsed / BLOCK_DURATION);
 
   if (timeInBlock < COUNTDOWN_DURATION) {
-    // In 3-hour countdown phase
     return {
       phase: "countdown",
       timeLeft: COUNTDOWN_DURATION - timeInBlock,
       blockIndex,
     };
-  } else {
-    // In 15-minute pause phase
-    return {
-      phase: "pause",
-      timeLeft: blockDuration - timeInBlock,
-      blockIndex,
-    };
   }
+  return {
+    phase: "pause",
+    timeLeft: BLOCK_DURATION - timeInBlock,
+    blockIndex,
+  };
 };
 
 export const CountdownTimer: React.FC = () => {
@@ -70,7 +66,7 @@ export const CountdownTimer: React.FC = () => {
     seconds: number;
   }>({ hours: 0, minutes: 0, seconds: 0 });
   const [isPaused, setIsPaused] = useState(false);
-//   const [currentOffer, setCurrentOffer] = useState("");
+  const [currentOffer, setCurrentOffer] = useState("");
 
   // Initialize or restore timer state
   useEffect(() => {
@@ -101,7 +97,7 @@ export const CountdownTimer: React.FC = () => {
         const cycleStart = today.getTime();
 
         // If it's already past 12 PM today, start the cycle
-        const randomIndex = Math.floor(Math.random() * OFFERS.length);
+        const randomIndex = 0;
         state = {
           currentCycleStart: cycleStart,
           isInCountdownPhase: true,
@@ -111,7 +107,7 @@ export const CountdownTimer: React.FC = () => {
       }
 
       localStorage.setItem("offerTimerState", JSON.stringify(state));
-    //   setCurrentOffer(OFFERS[state.currentOfferIndex]);
+      setCurrentOffer(OFFERS[state.currentOfferIndex]);
       return state;
     };
 
@@ -138,21 +134,14 @@ export const CountdownTimer: React.FC = () => {
 
       const phase = getCurrentPhase(now, currentState.currentCycleStart);
 
-      // Update offer if we're in a new block (every 3h 15min)
-      if (phase.blockIndex !== currentState.currentBlockIndex) {
-        let newOfferIndex = Math.floor(Math.random() * OFFERS.length);
-        // Ensure different offer
-        do {
-          newOfferIndex = Math.floor(Math.random() * OFFERS.length);
-        } while (
-          newOfferIndex === currentState.currentOfferIndex &&
-          OFFERS.length > 1
-        );
-
-        currentState.currentBlockIndex = phase.blockIndex;
-        currentState.currentOfferIndex = newOfferIndex;
-        // setCurrentOffer(OFFERS[newOfferIndex]);
-        localStorage.setItem("offerTimerState", JSON.stringify(currentState));
+      // Deterministic, time-based offer selection (consistent across apps/services)
+      const absoluteBlockIndex = Math.floor(
+        (now - REFERENCE_START_UTC) / BLOCK_DURATION
+      );
+      const offerIndex =
+        ((absoluteBlockIndex % OFFERS.length) + OFFERS.length) % OFFERS.length;
+      if (OFFERS[offerIndex] !== currentOffer) {
+        setCurrentOffer(OFFERS[offerIndex]);
       }
 
       // Update timer display with safety checks
@@ -181,39 +170,54 @@ export const CountdownTimer: React.FC = () => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-lg p-3 border border-primary/20">
+    <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-lg p-2 border border-primary/20">
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5">
-          <Zap className="h-3 w-3 text-primary animate-pulse" />
-          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-            Deal Ends In
+        <div className="flex flex-row items-center gap-1">
+          <>
+            <Zap className="h-[20px] w-[20px] text-primary animate-pulse" />
+          </>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1.5">
+              {currentOffer ? (
+                <div className="text-[14px] font-semibold text-primary  leading-tight">
+                  {currentOffer}
+                </div>
+              ) : null}
+            </div>
+            <div className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
+              Deal Ends In
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-1 justify-end">
-          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded-md px-3 py-2 min-w-[3rem] border border-primary/10">
-            <span className="text-xl font-bold text-foreground tabular-nums leading-none">
+        <div className="flex items-center gap-1.5 flex-1 justify-end">
+          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded px-2 py-1 min-w-[3rem] border border-primary/10">
+            <span className="text-lg font-bold text-foreground tabular-nums leading-none">
               {formatNumber(timeLeft.hours)}
             </span>
-            <span className="text-[8px] text-muted-foreground uppercase tracking-wide leading-none mt-0.5">
+            <span className="text-[8px] text-muted-foreground uppercase leading-none mt-0.5">
               Hours
             </span>
           </div>
-          <span className="text-muted-foreground/60 font-bold text-lg">:</span>
-          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded-md px-3 py-2 min-w-[3rem] border border-primary/10">
-            <span className="text-xl font-bold text-foreground tabular-nums leading-none">
+          <span className="text-muted-foreground/60 font-semibold text-sm">
+            :
+          </span>
+          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded px-2 py-1 min-w-[2.5rem] border border-primary/10">
+            <span className="text-base font-bold text-foreground tabular-nums leading-none">
               {formatNumber(timeLeft.minutes)}
             </span>
-            <span className="text-[8px] text-muted-foreground uppercase tracking-wide leading-none mt-0.5">
+            <span className="text-[8px] text-muted-foreground uppercase leading-none mt-0.5">
               Minutes
             </span>
           </div>
-          <span className="text-muted-foreground/60 font-bold text-lg">:</span>
-          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded-md px-3 py-2 min-w-[3rem] border border-primary/10">
-            <span className="text-xl font-bold text-foreground tabular-nums leading-none">
+          <span className="text-muted-foreground/60 font-semibold text-sm">
+            :
+          </span>
+          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded px-2 py-1 min-w-[2.5rem] border border-primary/10">
+            <span className="text-base font-bold text-foreground tabular-nums leading-none">
               {formatNumber(timeLeft.seconds)}
             </span>
-            <span className="text-[8px] text-muted-foreground uppercase tracking-wide leading-none mt-0.5">
+            <span className="text-[8px] text-muted-foreground uppercase leading-none mt-0.5">
               Seconds
             </span>
           </div>
