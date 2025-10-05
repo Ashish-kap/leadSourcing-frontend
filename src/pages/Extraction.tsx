@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import { useScrapeJob } from "../store/hooks/useScrape";
 import { scrapeJobPostRequest } from "../store/api/types/scrapeJob";
@@ -34,6 +34,7 @@ import { Loader2, RotateCcw, HelpCircle } from "lucide-react";
 import { trackEvent } from "@/service/analytics";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { InfoAlertDialog } from "@/components/ui/info-alert-dialog";
 
 interface LocationState {
   countryCode: string;
@@ -43,6 +44,8 @@ interface LocationState {
 
 export const Extraction: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showExtractionGuideDialog, setShowExtractionGuideDialog] =
+    useState(false);
   const { data: userData } = useGetCurrentUserQuery();
   const {
     startScraping,
@@ -53,6 +56,15 @@ export const Extraction: React.FC = () => {
     hasFailed,
     resetScrapeJob,
   } = useScrapeJob();
+
+  // Show extraction guide dialog on first visit
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem("hasSeenExtractionGuide");
+    if (!hasSeenGuide) {
+      setShowExtractionGuideDialog(true);
+      localStorage.setItem("hasSeenExtractionGuide", "true");
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     keyword: "",
@@ -1080,6 +1092,67 @@ export const Extraction: React.FC = () => {
           </main>
         </div>
       </div>
+
+      {/* Extraction Guide Dialog */}
+      <InfoAlertDialog
+        open={showExtractionGuideDialog}
+        onOpenChange={setShowExtractionGuideDialog}
+        title="📍 How Location Selection Works"
+        showPulsingIndicator={true}
+        pulsingIndicatorColor="bg-blue-500"
+        buttonText="Got it, let's start!"
+        sections={[
+          {
+            variant: "info",
+            content: (
+              <div className="space-y-2">
+                <p className="font-semibold text-sm">
+                  Understanding Location-Based Extraction:
+                </p>
+                <ul className="space-y-1.5 ml-2 text-xs">
+                  <li>
+                    <strong>🌍 Country Only:</strong> Scrapes data from random
+                    locations across the entire country. Best for maximum data
+                    coverage.
+                  </li>
+                  <li>
+                    <strong>🗺️ Country + State:</strong> Scrapes data only from
+                    the selected state/province. Provides regional focus with
+                    good data volume.
+                  </li>
+                  <li>
+                    <strong>📍 Country + State + City:</strong> Scrapes data
+                    specifically from the chosen city. Most precise but may
+                    yield fewer results.
+                  </li>
+                </ul>
+              </div>
+            ),
+          },
+          {
+            variant: "success",
+            content: (
+              <p className="text-xs">
+                <strong>💡 Recommended:</strong> For optimal data volume, use{" "}
+                <strong>Country + State</strong> selection. This strikes the
+                perfect balance between targeting specific regions and getting
+                substantial data results.
+              </p>
+            ),
+          },
+          {
+            variant: "warning",
+            content: (
+              <p className="text-xs">
+                <strong>⚠️ Note:</strong> Selecting a specific city may
+                significantly limit your results, especially for niche business
+                categories. If you need more data, consider broadening your
+                search to state or country level.
+              </p>
+            ),
+          },
+        ]}
+      />
     </TooltipProvider>
   );
 };
