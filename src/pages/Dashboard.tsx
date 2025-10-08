@@ -51,7 +51,7 @@ export const Dashboard: React.FC = () => {
     {
       title: "Credits Remaining",
       value:
-        userData?.user.plan === "business" || userData?.user.plan === "free"
+        userData?.user.plan === "business"
           ? "∞"
           : userData?.user.credits.remaining.toString() || "0",
       change: `${userData?.user.creditPercentage || "0"}% remaining`,

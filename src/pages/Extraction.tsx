@@ -243,6 +243,15 @@ export const Extraction: React.FC = () => {
       return;
     }
 
+    // Validate reviewTimeRange if provided
+    if (
+      formData.reviewTimeRange !== null &&
+      (formData.reviewTimeRange < 0 || formData.reviewTimeRange > 10)
+    ) {
+      toast.error("Reviews time range must be between 0 and 10 years");
+      return;
+    }
+
     // if (!location.stateCode) {
     //   toast.error("Please select a state");
     //   return;
@@ -352,8 +361,28 @@ export const Extraction: React.FC = () => {
       toast.success(`Scraping started! Job ID: ${result.jobId}`);
       // Set flag to show live data dialog on Dashboard
       localStorage.setItem("showLiveDataDialog", "true");
-    } catch (error) {
-      // Error handled by the hook
+    } catch (error: any) {
+      // Handle backend validation errors
+      const errorMessage =
+        error?.data?.error || error?.message || "Failed to start scraping";
+
+      // Check for specific validation errors
+      if (errorMessage.includes("reviewTimeRange")) {
+        toast.error(
+          "Invalid review time range. Please enter a value between 0 and 10 years."
+        );
+      } else if (errorMessage.includes("ratingFilter")) {
+        toast.error(
+          "Invalid rating filter. Please enter a value between 1 and 5."
+        );
+      } else if (errorMessage.includes("maxRecords")) {
+        toast.error(
+          "Invalid number of records. Please check your plan limits."
+        );
+      } else {
+        // Show the original error message from backend
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -579,8 +608,8 @@ export const Extraction: React.FC = () => {
                             <TooltipContent>
                               <p>
                                 Optional: Only include businesses with reviews
-                                posted within the last X years. Leave empty for
-                                all reviews.
+                                posted within the last X years (0-10). Leave
+                                empty for all reviews.
                               </p>
                             </TooltipContent>
                           </Tooltip>
@@ -591,8 +620,8 @@ export const Extraction: React.FC = () => {
                           type="number"
                           value={formData.reviewTimeRange || ""}
                           onChange={handleInputChange}
-                          min="1"
-                          max="30"
+                          min="0"
+                          max="10"
                           placeholder="eg. 5"
                         />
                       </div>
