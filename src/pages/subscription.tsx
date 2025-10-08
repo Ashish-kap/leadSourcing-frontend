@@ -117,8 +117,8 @@ const Subscription: React.FC = () => {
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "Unlimited extractions",
-        "1,000 records per extraction",
+        "Unlimited Contacts",
+        // "1,000 records per extraction",
         // "10,000 extractions/month",
         "Complete business profiles",
         "All export formats",
