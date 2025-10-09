@@ -57,6 +57,7 @@ import {
   useGetJobsQuery,
   useDeleteJobMutation,
 } from "@/store/api/scrapeJobApi";
+import { useGetCurrentUserQuery } from "@/store/api/authApi";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -217,6 +218,8 @@ export const ExtractionsTable: React.FC = () => {
     refetch: refetchJobs, // ADD: refetch function
   } = useGetJobsQuery();
 
+  const { refetch: refetchUser } = useGetCurrentUserQuery();
+
   const [deleteJob, { isLoading: isDeletingJob }] = useDeleteJobMutation();
 
   // Debug: Log jobsData to see what's actually being received
@@ -282,6 +285,8 @@ export const ExtractionsTable: React.FC = () => {
         });
         // Refetch jobs data to update the table
         refetchJobs();
+        // Refetch user data to update credits/usage
+        refetchUser();
       } else if (data.type === "job_no_data_found") {
         // Clean up real-time progress for completed job
         setRealtimeProgress((prev) => {
@@ -291,6 +296,8 @@ export const ExtractionsTable: React.FC = () => {
         });
         // Refetch jobs data to update the table
         refetchJobs();
+        // Refetch user data to update credits/usage
+        refetchUser();
       } else if (data.type === "job_failed") {
         console.log(`❌ Job failed: ${data.job.error?.message}`);
         // Clean up real-time progress for failed job
@@ -300,6 +307,8 @@ export const ExtractionsTable: React.FC = () => {
           return updated;
         });
         refetchJobs();
+        // Refetch user data to update credits/usage
+        refetchUser();
       } else if (data.type === "job_started") {
         console.log(`🚀 Job started: ${data.job.jobId}`);
         refetchJobs();
