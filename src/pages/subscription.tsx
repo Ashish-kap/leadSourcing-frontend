@@ -112,8 +112,8 @@ const Subscription: React.FC = () => {
     // },
     {
       name: "Business",
-      price: "$20",
-      oldPrice: "$50",
+      price: "$59",
+      oldPrice: "$99",
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
