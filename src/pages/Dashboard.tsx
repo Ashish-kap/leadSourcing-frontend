@@ -50,10 +50,10 @@ export const Dashboard: React.FC = () => {
     // },
     {
       title: "Credits Remaining",
-      value:
-        userData?.user.plan === "business"
-          ? "∞"
-          : userData?.user.credits.remaining.toString() || "0",
+      value: userData?.user.credits.remaining.toString() || "0",
+      // userData?.user.plan === "business"
+      //   ? "∞"
+      //   : userData?.user.credits.remaining.toString() || "0",
       change: `${userData?.user.creditPercentage || "0"}% remaining`,
       trend: "up" as const,
       icon: DollarSign,
@@ -129,12 +129,14 @@ export const Dashboard: React.FC = () => {
                   <div className="flex justify-between text-sm pb-4">
                     <span className="text-muted-foreground">Credits Used</span>
                     <span className="font-medium text-foreground">
-                      {userData?.user.plan === "business" ||
+                      {/* {userData?.user.plan === "business" ||
                       userData?.user.plan === "free"
                         ? "-"
                         : `${userData?.user.credits.used || 0} / ${
                             userData?.user.credits.total || 0
-                          }`}
+                          }`} */}
+                      {userData?.user.credits.used || 0} /{" "}
+                      {userData?.user.credits.total || 0}
                     </span>
                   </div>
                   <Progress

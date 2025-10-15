@@ -41,8 +41,8 @@ const Signup = () => {
 
   useEffect(() => {
     // Initialize Google Auth when component mounts
-    initializeGoogleAuth().catch((error) => {
-      console.error("Failed to initialize Google Auth:", error);
+    initializeGoogleAuth().catch(() => {
+      // Failed to initialize Google Auth
     });
   }, []);
 
@@ -111,7 +111,7 @@ const Signup = () => {
         "Welcome! Your account has been created successfully with Google."
       );
     } catch (error: any) {
-      console.error("Google signup error:", error);
+      // Google signup error
       toast.error("Google signup failed. Please try again.");
     }
   };

@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
       await logout();
       toast.success("Logout Successfully!");
     } catch (error) {
-      console.log(error);
+      // Handle error silently
     }
   };
 

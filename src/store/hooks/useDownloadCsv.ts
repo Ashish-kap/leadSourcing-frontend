@@ -19,7 +19,7 @@ export function useDownloadCsv() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Download failed:", error);
+      // Download failed
       // You can add further error handling here if desired
     }
   };

@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       await logout();
       toast.success("Logout Successfully!.");
     } catch (error) {
-      console.log(error);
+      // Handle error silently
     }
   };
   return (
