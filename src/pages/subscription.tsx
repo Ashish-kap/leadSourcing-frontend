@@ -1,16 +1,6 @@
 import React from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   BillingModal,
@@ -20,14 +10,16 @@ import {
   createSubscription,
   type CreateSubscriptionPayload,
 } from "@/service/api";
-import { CountdownTimer } from "@/components/CounterTimer";
+import { PricingCard, type PricingPlan } from "@/components/PricingCard";
 
 const Subscription: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [isBillingModalOpen, setIsBillingModalOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [selectedProductId, setSelectedProductId] = React.useState<string>("");
 
-  const handleGetStarted = async () => {
+  const handleGetStarted = async (productId: string) => {
+    setSelectedProductId(productId);
     setIsBillingModalOpen(true);
   };
 
@@ -35,12 +27,11 @@ const Subscription: React.FC = () => {
     setIsLoading(true);
     try {
       // Get environment variables
-      const productId = import.meta.env.VITE_PRODUCT_ID;
       const returnUrl = import.meta.env.VITE_RETURN_URL;
 
-      if (!productId || !returnUrl) {
+      if (!selectedProductId || !returnUrl) {
         throw new Error(
-          "Missing required environment variables: VITE_PRODUCT_ID or VITE_RETURN_URL"
+          "Missing required data: selectedProductId or VITE_RETURN_URL"
         );
       }
 
@@ -53,18 +44,14 @@ const Subscription: React.FC = () => {
           street: billingData.street,
           zipcode: billingData.zipcode,
         },
-        product_id: productId,
+        product_id: selectedProductId,
         return_url: returnUrl,
         payment_link: true,
         quantity: 1,
       };
 
-      console.log("Creating subscription with payload:", payload);
-
       // Call the subscription API
       const response = await createSubscription(payload);
-
-      console.log("Subscription created successfully:", response);
 
       // Check if response is successful and has payment link
       if (
@@ -83,7 +70,7 @@ const Subscription: React.FC = () => {
       // You can add success notification here
       toast.success("Redirecting to payment...");
     } catch (error) {
-      console.error("Payment processing failed:", error);
+      // Payment processing failed
       // You can add error notification here
       toast.error("Payment processing failed. Please try again.");
     } finally {
@@ -95,21 +82,23 @@ const Subscription: React.FC = () => {
     setIsBillingModalOpen(false);
   };
 
-  const pricingPlans = [
-    // {
-    //   name: "Starter",
-    //   price: "$0",
-    //   period: "/month",
-    //   description: "Perfect for small businesses and freelancers",
-    //   features: [
-    //     "Limited extractions",
-    //     "Basic business info",
-    //     "CSV export",
-    //     "Email support",
-    //     "Basic filtering",
-    //   ],
-    //   popular: false,
-    // },
+  const pricingPlans: PricingPlan[] = [
+    {
+      name: "Pro",
+      price: "$59",
+      oldPrice: "$99",
+      period: "/month",
+      description: "Best for growing businesses and agencies",
+      features: [
+        "10000 contacts / month",
+        "Complete business profiles",
+        "All export formats",
+        "Priority support",
+        "Advanced filtering",
+      ],
+      productId: import.meta.env.DODO_PRODUCT_ID_PLAN_PRO,
+      popular: true,
+    },
     {
       name: "Business",
       price: "$149",
@@ -117,16 +106,13 @@ const Subscription: React.FC = () => {
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "Unlimited Contacts",
-        // "1,000 records per extraction",
-        // "10,000 extractions/month",
+        "100000 contacts / month",
         "Complete business profiles",
         "All export formats",
         "Priority support",
         "Advanced filtering",
-        // "API access",
-        // "Bulk processing",
       ],
+      productId: import.meta.env.DODO_PRODUCT_ID_PLAN_BUSINESS,
       popular: true,
     },
   ];
@@ -153,69 +139,13 @@ const Subscription: React.FC = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-sm mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
                 {pricingPlans.map((plan, index) => (
-                  <Card
+                  <PricingCard
                     key={index}
-                    className={`relative ${
-                      plan.popular
-                        ? "border-primary shadow-xl scale-[1.02]"
-                        : ""
-                    }`}
-                  >
-                    {plan.popular && (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                        Limited Time Offer
-                      </Badge>
-                    )}
-                    <CardHeader className="text-center">
-                      <CardTitle className="text-xl sm:text-2xl">
-                        {plan.name}
-                      </CardTitle>
-
-                      <div className="mt-4 flex items-center justify-center gap-3">
-                        {(plan as any).oldPrice ? (
-                          <span className="text-lg sm:text-xl text-muted-foreground line-through">
-                            {(plan as any).oldPrice}
-                          </span>
-                        ) : null}
-                        <span className="text-3xl sm:text-4xl font-bold">
-                          {plan.price}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {plan.period}
-                        </span>
-                      </div>
-                      <CardDescription>{plan.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-3">
-                        {plan.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center">
-                            <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <>
-                        {plan.popular && (
-                          <div className="mt-6">
-                            <CountdownTimer />
-                          </div>
-                        )}
-                      </>
-                      <Button
-                        className={`w-full mt-2 cursor-pointer ${
-                          plan.popular ? "bg-primary" : ""
-                        }`}
-                        variant={plan.popular ? "default" : "outline"}
-                        onClick={handleGetStarted}
-                      >
-                        Upgrade
-                      </Button>
-                    </CardContent>
-                  </Card>
+                    plan={plan}
+                    onUpgrade={handleGetStarted}
+                  />
                 ))}
               </div>
             </section>

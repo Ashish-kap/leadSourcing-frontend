@@ -136,7 +136,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
           );
         }
       } catch (pollError) {
-        console.error("Error polling for subscription status:", pollError);
+        // Error polling for subscription status
         toast.warning(
           "Please refresh the page to check your subscription status."
         );
@@ -187,7 +187,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
             pollForSubscriptionStatus();
           }
         } catch (subscriptionError: any) {
-          console.error("Error cancelling subscription:", subscriptionError);
+          // Error cancelling subscription
           // Still show success for feedback, but warn about subscription
           toast.warning(
             "Feedback submitted, but there was an issue cancelling your subscription. Please contact support."
@@ -203,7 +203,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
         onClose();
       }
     } catch (error: any) {
-      console.error("Error submitting:", error);
+      // Error submitting
 
       // Extract error message from API response
       let errorMessage = "Failed to submit. Please try again.";

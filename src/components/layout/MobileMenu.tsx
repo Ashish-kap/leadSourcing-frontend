@@ -40,7 +40,7 @@ export const MobileMenu: React.FC = () => {
       toast.success("Logout Successfully!");
       setIsOpen(false);
     } catch (error) {
-      console.log(error);
+      // Handle error silently
     }
   };
 

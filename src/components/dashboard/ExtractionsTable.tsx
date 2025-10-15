@@ -201,7 +201,7 @@ export const ExtractionsTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
+  const [, setIsMobile] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [realtimeProgress, setRealtimeProgress] = useState<
     Record<string, number>
@@ -225,14 +225,8 @@ export const ExtractionsTable: React.FC = () => {
   // Debug: Log jobsData to see what's actually being received
   useEffect(() => {
     if (jobsData?.jobs) {
-      console.log("Jobs data received:", jobsData.jobs);
-      jobsData.jobs.forEach((job, index) => {
-        console.log(`Job ${index}:`, {
-          id: job.id,
-          maxRecords: job.maxRecords,
-          progress: job.progress,
-          status: job.status,
-        });
+      jobsData.jobs.forEach(() => {
+        // Process job data as needed
       });
     }
   }, [jobsData]);
@@ -242,11 +236,9 @@ export const ExtractionsTable: React.FC = () => {
     const token = localStorage.getItem("authToken");
 
     if (!token) {
-      console.warn("No token found for Socket.IO connection");
+      // No token found for Socket.IO connection
       return;
     }
-
-    console.log("🔌 Initializing Socket.IO connection...");
 
     const newSocket = io(import.meta.env.VITE_BACKEND_HOST, {
       auth: { token },
@@ -255,28 +247,21 @@ export const ExtractionsTable: React.FC = () => {
 
     // Connection event handlers
     newSocket.on("connect", () => {
-      console.log("✅ Socket.IO connected:", newSocket.id);
       setIsConnected(true);
     });
 
-    newSocket.on("connect_error", (error) => {
-      console.error("❌ Socket.IO connection error:", error.message);
+    newSocket.on("connect_error", () => {
+      // Socket.IO connection error
       setIsConnected(false);
     });
 
-    newSocket.on("disconnect", (reason) => {
-      console.log("🔌 Socket.IO disconnected:", reason);
+    newSocket.on("disconnect", () => {
       setIsConnected(false);
     });
 
     // Job event handlers
     newSocket.on("job_update", (data) => {
-      console.log("🔄 Job update received:", data);
-
       if (data.type === "job_completed") {
-        console.log(
-          `✅ Job completed with ${data.job.totalExtractions || 0} extractions!`
-        );
         // Clean up real-time progress for completed job
         setRealtimeProgress((prev) => {
           const updated = { ...prev };
@@ -299,7 +284,6 @@ export const ExtractionsTable: React.FC = () => {
         // Refetch user data to update credits/usage
         refetchUser();
       } else if (data.type === "job_failed") {
-        console.log(`❌ Job failed: ${data.job.error?.message}`);
         // Clean up real-time progress for failed job
         setRealtimeProgress((prev) => {
           const updated = { ...prev };
@@ -310,16 +294,11 @@ export const ExtractionsTable: React.FC = () => {
         // Refetch user data to update credits/usage
         refetchUser();
       } else if (data.type === "job_started") {
-        console.log(`🚀 Job started: ${data.job.jobId}`);
         refetchJobs();
       }
     });
 
     newSocket.on("job_progress", (data) => {
-      console.log(
-        `📈 Job progress: ${data.jobId} - ${data.progress.percentage}%`
-      );
-
       // Update real-time progress state
       setRealtimeProgress((prev) => ({
         ...prev,
@@ -327,14 +306,12 @@ export const ExtractionsTable: React.FC = () => {
       }));
     });
 
-    newSocket.on("active_jobs_status", (data) => {
-      console.log("📊 Active jobs status:", data);
+    newSocket.on("active_jobs_status", () => {
       // Handle active jobs status if needed
     });
 
     // IMPORTANT: Cleanup function
     return () => {
-      console.log("🧹 Cleaning up Socket.IO connection...");
       newSocket.removeAllListeners();
       newSocket.disconnect();
       setIsConnected(false);
@@ -343,7 +320,6 @@ export const ExtractionsTable: React.FC = () => {
 
   // handle mobile layout
   useEffect(() => {
-    console.log(isMobile);
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -358,7 +334,7 @@ export const ExtractionsTable: React.FC = () => {
       await deleteJob(jobId).unwrap();
       toast.success(`Successfully deleted extraction for "${jobKeyword}"`);
     } catch (error: any) {
-      console.error("Delete job error:", error);
+      // Delete job error
       toast.error("Failed to delete extraction. Please try again.");
     }
   };

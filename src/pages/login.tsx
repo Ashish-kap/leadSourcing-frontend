@@ -46,8 +46,8 @@ const Login = () => {
 
   useEffect(() => {
     // Initialize Google Auth when component mounts
-    initializeGoogleAuth().catch((error) => {
-      console.error("Failed to initialize Google Auth:", error);
+    initializeGoogleAuth().catch(() => {
+      // Failed to initialize Google Auth
     });
   }, []);
 
@@ -76,8 +76,8 @@ const Login = () => {
       toast.success(
         "Welcome! You have been successfully logged in with Google."
       );
-    } catch (error: any) {
-      console.error("Google login error:", error);
+    } catch {
+      // Google login error
       toast.error("Google login failed. Please try again.");
     }
   };
