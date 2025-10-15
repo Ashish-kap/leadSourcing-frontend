@@ -29,10 +29,16 @@ const Subscription: React.FC = () => {
       // Get environment variables
       const returnUrl = import.meta.env.VITE_RETURN_URL;
 
-      if (!selectedProductId || !returnUrl) {
-        throw new Error(
-          "Missing required data: selectedProductId or VITE_RETURN_URL"
-        );
+      // Get actual product ID based on plan name
+      let actualProductId = "";
+      if (selectedProductId === "pro") {
+        actualProductId = import.meta.env.VITE_PLAN_PRO;
+      } else if (selectedProductId === "business") {
+        actualProductId = import.meta.env.VITE_PLAN_BUSINESS;
+      }
+
+      if (!actualProductId || !returnUrl) {
+        throw new Error("Missing required data: productId or VITE_RETURN_URL");
       }
 
       // Prepare API payload
@@ -44,7 +50,7 @@ const Subscription: React.FC = () => {
           street: billingData.street,
           zipcode: billingData.zipcode,
         },
-        product_id: selectedProductId,
+        product_id: actualProductId,
         return_url: returnUrl,
         payment_link: true,
         quantity: 1,
@@ -96,7 +102,7 @@ const Subscription: React.FC = () => {
         "Priority support",
         "Advanced filtering",
       ],
-      productId: import.meta.env.DODO_PRODUCT_ID_PLAN_PRO,
+      productId: "pro",
       popular: true,
     },
     {
@@ -112,7 +118,7 @@ const Subscription: React.FC = () => {
         "Priority support",
         "Advanced filtering",
       ],
-      productId: import.meta.env.DODO_PRODUCT_ID_PLAN_BUSINESS,
+      productId: "business",
       popular: true,
     },
   ];
