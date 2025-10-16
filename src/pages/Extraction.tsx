@@ -465,7 +465,7 @@ export const Extraction: React.FC = () => {
                         name="keyword"
                         value={formData.keyword}
                         onChange={handleInputChange}
-                        placeholder="e.g., coffee shops, restaurants, hotels"
+                        placeholder="eg. restaurants"
                         required
                       />
                     </div>

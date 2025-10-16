@@ -295,6 +295,10 @@ export const ExtractionsTable: React.FC = () => {
         refetchUser();
       } else if (data.type === "job_started") {
         refetchJobs();
+      }else if (data.type === "job_deleted") {
+        refetchJobs();
+        // Refetch user data to update credits/usage
+        refetchUser();
       }
     });
 
