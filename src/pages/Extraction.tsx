@@ -235,10 +235,19 @@ export const Extraction: React.FC = () => {
       return;
     }
 
-    // Check plan limits for free users
+    // Check if user has enough credits
+    const remainingCredits = userData?.user.credits?.remaining;
+    if (remainingCredits !== undefined && remainingCredits < formData.maxRecords) {
+      toast.error(
+        `Insufficient credits. You have ${remainingCredits} credits remaining, but need ${formData.maxRecords} credits for this extraction. Please upgrade your plan or reduce the number of records.`
+      );
+      return;
+    }
+
+    // Check plan limits for free users (fallback check)
     if (userData?.user.plan === "free" && formData.maxRecords > 50) {
       toast.error(
-        "Free plans are limited to 50 records. Please upgrade to Business plan for unlimited extractions."
+        "Free plans are limited to 50 records. Please upgrade to Business plan for more extractions."
       );
       return;
     }
