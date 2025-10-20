@@ -81,6 +81,7 @@ export const Extraction: React.FC = () => {
     reviewsWithinLastYears: null as number | null,
     isExtractEmail: true,
     isValidate: false,
+    extractNegativeReviews: false,
   });
 
   const [location, setLocation] = useState<LocationState>({
@@ -192,6 +193,13 @@ export const Extraction: React.FC = () => {
     }));
   };
 
+  const handleExtractNegativeReviewsCheckboxChange = (checked: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      extractNegativeReviews: checked === true,
+    }));
+  };
+
   const handleRatingOperatorChange = (
     operator: "gt" | "lt" | "gte" | "lte"
   ) => {
@@ -295,6 +303,7 @@ export const Extraction: React.FC = () => {
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
       isExtractEmail: formData.isExtractEmail,
       isValidate: formData.isValidate,
+      extractNegativeReviews: formData.extractNegativeReviews,
     };
 
     const scrapeRequest = Object.fromEntries(
@@ -346,7 +355,7 @@ export const Extraction: React.FC = () => {
         }
 
         // Boolean fields
-        if (key === "isExtractEmail" || key === "isValidate") {
+        if (key === "isExtractEmail" || key === "isValidate" || key === "extractNegativeReviews") {
           return typeof value === "boolean";
         }
 
@@ -364,6 +373,7 @@ export const Extraction: React.FC = () => {
         max_records: formData.maxRecords || 0,
         extract_email: formData.isExtractEmail,
         validate_data: formData.isValidate,
+        extract_negative_reviews: formData.extractNegativeReviews,
       });
 
       const result = await startScraping(scrapeRequest);
@@ -411,6 +421,7 @@ export const Extraction: React.FC = () => {
       reviewsWithinLastYears: null,
       isExtractEmail: true,
       isValidate: false, // Always start as false since it depends on email extraction
+      extractNegativeReviews: false,
     });
     setLocation({
       countryCode: "",
@@ -821,6 +832,34 @@ export const Extraction: React.FC = () => {
                                     ⚠️ Requires "Scrape Email" to be enabled
                                   </span>
                                 )}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Checkbox
+                          id="extractNegativeReviews"
+                          checked={formData.extractNegativeReviews}
+                          onCheckedChange={handleExtractNegativeReviewsCheckboxChange}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="extractNegativeReviews"
+                            className="cursor-pointer"
+                          >
+                            Extract Negative Reviews
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Enable this option to extract negative reviews (low ratings) 
+                                from businesses. This can help identify businesses with poor 
+                                customer satisfaction or service quality issues.
                               </p>
                             </TooltipContent>
                           </Tooltip>
