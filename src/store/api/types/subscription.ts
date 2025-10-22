@@ -1,5 +1,6 @@
 export interface CancelSubscriptionRequest {
   subscriptionId: string;
+  cancel_at_next_billing_date?: boolean;
 }
 
 export interface Subscription {

@@ -10,9 +10,12 @@ export const subscriptionApi = apiSlice.injectEndpoints({
       CancelSubscriptionResponse,
       CancelSubscriptionRequest
     >({
-      query: ({ subscriptionId }) => ({
+      query: ({ subscriptionId, cancel_at_next_billing_date = true }) => ({
         url: `/dodo-payments/subscriptions/${subscriptionId}`,
         method: "PATCH",
+        body: {
+          cancel_at_next_billing_date,
+        },
       }),
       transformResponse: (response: CancelSubscriptionResponse) => {
         return response;

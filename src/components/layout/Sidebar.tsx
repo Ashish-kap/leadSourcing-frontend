@@ -85,7 +85,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
           .filter((item) => {
             // Show Subscription only for free plan users
             if (item.href === "/subscription") {
-              return user?.user?.plan === "free";
+              // return user?.user?.plan === "free";
+              return true
             }
             return true;
           })
