@@ -12,6 +12,7 @@ export interface User {
     nextBillingDate: string | null;
     previousBillingDate: string | null;
     paymentFrequencyInterval: string | null;
+    cancel_at_next_billing_date: boolean | null;
   };
   credits: {
     total: number;

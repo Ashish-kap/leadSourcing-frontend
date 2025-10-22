@@ -112,40 +112,40 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
   }, [isOpen, form]);
 
   // Reusable polling function for subscription status
-  const pollForSubscriptionStatus = React.useCallback(() => {
-    let attempts = 0;
-    const maxAttempts = 20; // 20 attempts * 1 second = 20 seconds max
-    const pollInterval = 1000; // 1 second
+  // const pollForSubscriptionStatus = React.useCallback(() => {
+  //   let attempts = 0;
+  //   const maxAttempts = 20; // 20 attempts * 1 second = 20 seconds max
+  //   const pollInterval = 1000; // 1 second
 
-    const poll = async () => {
-      try {
-        const updatedUser = await refetchUser();
-        const subscriptionStatus = updatedUser.data?.user?.subscription?.status;
+  //   const poll = async () => {
+  //     try {
+  //       const updatedUser = await refetchUser();
+  //       const subscriptionStatus = updatedUser.data?.user?.subscription?.status;
 
-        if (subscriptionStatus === "cancelled") {
-          toast.success("Your subscription has been cancelled successfully!");
-          return;
-        }
+  //       if (subscriptionStatus === "cancelled") {
+  //         toast.success("Your subscription has been cancelled successfully!");
+  //         return;
+  //       }
 
-        attempts++;
-        if (attempts < maxAttempts) {
-          setTimeout(poll, pollInterval);
-        } else {
-          toast.warning(
-            "Subscription cancellation is taking longer than expected. Please refresh the page or contact support if needed."
-          );
-        }
-      } catch (pollError) {
-        // Error polling for subscription status
-        toast.warning(
-          "Please refresh the page to check your subscription status."
-        );
-      }
-    };
+  //       attempts++;
+  //       if (attempts < maxAttempts) {
+  //         setTimeout(poll, pollInterval);
+  //       } else {
+  //         toast.warning(
+  //           "Subscription cancellation is taking longer than expected. Please refresh the page or contact support if needed."
+  //         );
+  //       }
+  //     } catch (pollError) {
+  //       // Error polling for subscription status
+  //       toast.warning(
+  //         "Please refresh the page to check your subscription status."
+  //       );
+  //     }
+  //   };
 
-    // Start polling after a short delay
-    setTimeout(poll, 2000);
-  }, [refetchUser]);
+  //   // Start polling after a short delay
+  //   setTimeout(poll, 2000);
+  // }, [refetchUser]);
 
   const onSubmit = async (data: FeedbackFormData) => {
     try {
@@ -163,19 +163,20 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
         try {
           const subscriptionResponse = await cancelSubscription({
             subscriptionId: user.user.subscription.subscriptionId,
+            cancel_at_next_billing_date: true,
           }).unwrap();
 
           // Check if subscription was successfully cancelled immediately
-          if (subscriptionResponse.data.subscription.status === "cancelled") {
+          if (subscriptionResponse.data.subscription.cancel_at_next_billing_date === true) {
             // Immediate cancellation - refetch and show success
             await refetchUser();
             toast.success(
-              "Your subscription has been cancelled successfully. Thank you for your feedback!"
+              "Your subscription will be cancelled at the next billing cycle. Sorry to see you go!"
             );
             form.reset();
             onClose();
             // Start background polling to ensure webhook updates are reflected
-            pollForSubscriptionStatus();
+            // pollForSubscriptionStatus();
           } else {
             // Webhook processing - close modal and poll in background
             toast.info(
@@ -184,7 +185,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
             form.reset();
             onClose();
             // Start background polling for webhook completion
-            pollForSubscriptionStatus();
+            // pollForSubscriptionStatus();
           }
         } catch (subscriptionError: any) {
           // Error cancelling subscription

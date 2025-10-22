@@ -74,6 +74,9 @@ const Account = () => {
     return statusMap[user.user.subscription.status] || "Unknown";
   };
 
+  // Check if subscription is scheduled for cancellation
+  const isScheduledForCancellation = user?.user?.subscription?.cancel_at_next_billing_date === true;
+
   // Generate account data from API response
   const accountData = [
     {
@@ -90,18 +93,22 @@ const Account = () => {
     //   value: `${getPlanDisplayName(user?.user?.plan || "free")} Plan`,
     // },
     {
-      label: "Next Billing Period",
-      value: formatDate(user?.user?.subscription?.nextBillingDate ?? null),
+      label: isScheduledForCancellation ? "Subscription Ends" : "Next Billing Period",
+      value: isScheduledForCancellation 
+        ? formatDate(user?.user?.subscription?.nextBillingDate ?? null)
+        : formatDate(user?.user?.subscription?.nextBillingDate ?? null),
     },
     {
-      label: "Billing Cycle",
-      value: formatBillingCycle(
-        user?.user?.subscription?.paymentFrequencyInterval
-      ),
+      label: isScheduledForCancellation ? "Cancellation Status" : "Billing Cycle",
+      value: isScheduledForCancellation 
+        ? "Scheduled for cancellation"
+        : formatBillingCycle(user?.user?.subscription?.paymentFrequencyInterval),
     },
     {
       label: "Next Invoice",
-      value: getPlanPrice(user?.user?.plan || "free"),
+      value: isScheduledForCancellation 
+        ? getPlanPrice("free")
+        : getPlanPrice(user?.user?.plan || "free"),
     },
   ];
 
@@ -126,6 +133,20 @@ const Account = () => {
                 Manage your account settings and subscription
               </p>
             </div>
+
+            {/* Cancellation Notice */}
+            {isScheduledForCancellation && (
+              <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                  <p className="text-sm text-orange-800 dark:text-orange-200">
+                    <strong>Subscription Cancelled:</strong> Your subscription will end on{" "}
+                    {formatDate(user?.user?.subscription?.nextBillingDate ?? null)}. 
+                    You'll retain access until then.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Account Information Card */}
             <div className="card-elegant rounded-[var(--radius)] p-6 md:p-8 mb-6">
@@ -157,10 +178,10 @@ const Account = () => {
                 variant="destructive"
                 size="lg"
                 className="w-full sm:w-auto cursor-pointer"
-                disabled={user?.user?.plan === "free"}
+                disabled={user?.user?.plan === "free" || isScheduledForCancellation}
                 onClick={() => setIsCancelModalOpen(true)}
               >
-                Cancel Subscription
+                {isScheduledForCancellation ? "Subscription Cancelled" : "Cancel Subscription"}
               </Button>
               <Button
                 variant="outline"
