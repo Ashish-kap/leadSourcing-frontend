@@ -24,11 +24,24 @@ const Account = () => {
   const getPlanDisplayName = (plan: string) => {
     const planMap: Record<string, string> = {
       business: "Business",
+      pro: "Pro",
       professional: "Professional",
       premium: "Premium",
       free: "Free",
     };
     return planMap[plan] || plan;
+  };
+
+  // Helper function to get plan pricing
+  const getPlanPrice = (plan: string) => {
+    const priceMap: Record<string, string> = {
+      business: "$149.00",
+      pro: "$59.00",
+      professional: "$59.00", // in case you have both pro and professional
+      premium: "$149.00", // in case you have premium as business
+      free: "$0.00",
+    };
+    return priceMap[plan] || "$0.00";
   };
 
   // Helper function to format billing cycle
@@ -88,7 +101,7 @@ const Account = () => {
     },
     {
       label: "Next Invoice",
-      value: user?.user?.plan === "business" ? "$9.00" : "$0.00",
+      value: getPlanPrice(user?.user?.plan || "free"),
     },
   ];
 

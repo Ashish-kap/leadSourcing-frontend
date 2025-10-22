@@ -77,7 +77,7 @@ export default function ScraperPage() {
       throw new Error("Invalid country selection");
     }
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/scrape`, {
+      const { data } = await axios.post(`${BASE_URL}/api/scraper/scrape`, {
         keyword,
         city: city ? city : state,
         country,
