@@ -33,7 +33,7 @@ const menuItems = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
-  const { user, logout, isLoading: isLoggingOut } = useAuth();
+  const { logout, isLoading: isLoggingOut } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
