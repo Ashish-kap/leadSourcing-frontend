@@ -50,11 +50,14 @@ export const Dashboard: React.FC = () => {
     // },
     {
       title: "Credits Remaining",
-      value: userData?.user.credits.remaining.toString() || "0",
-      // userData?.user.plan === "business"
-      //   ? "∞"
-      //   : userData?.user.credits.remaining.toString() || "0",
-      change: `${userData?.user.creditPercentage || "0"}% remaining`,
+      value: 
+      // userData?.user.credits.remaining.toString() || "0",
+      userData?.user.plan === "business"
+        ? "∞"
+        : userData?.user.credits.remaining.toString() || "0",
+      change: userData?.user.plan === "business"
+        ? ""
+        : `${userData?.user.creditPercentage || "0"}% remaining`,
       trend: "up" as const,
       icon: DollarSign,
       gradient: true,
@@ -129,20 +132,23 @@ export const Dashboard: React.FC = () => {
                   <div className="flex justify-between text-sm pb-4">
                     <span className="text-muted-foreground">Credits Used</span>
                     <span className="font-medium text-foreground">
-                      {/* {userData?.user.plan === "business" ||
-                      userData?.user.plan === "free"
+                      {userData?.user.plan === "business"
                         ? "-"
                         : `${userData?.user.credits.used || 0} / ${
                             userData?.user.credits.total || 0
-                          }`} */}
-                      {userData?.user.credits.used || 0} /{" "}
-                      {userData?.user.credits.total || 0}
+                          }`}
+                      {/* {userData?.user.credits.used || 0} /{" "}
+                      {userData?.user.credits.total || 0} */}
                     </span>
                   </div>
-                  <Progress
-                    value={parseFloat(userData?.user.creditPercentage || "0")}
-                    className="h-2"
-                  />
+                  {userData?.user.plan !== "business" && (
+                    <>
+                     <Progress
+                        value={parseFloat(userData?.user.creditPercentage || "0")}
+                        className="h-2"
+                      />
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -154,90 +160,6 @@ export const Dashboard: React.FC = () => {
             <div className="xl:col-span-3 order-1 xl:order-1">
               <ExtractionsTable />
             </div>
-
-            {/* Right Column - Shows first on mobile */}
-            {/* <div className="space-y-6 order-1 xl:order-2"> */}
-            {/* Quick Actions */}
-            {/* <QuickActions /> */}
-
-            {/* Account Overview - Hidden on mobile for space */}
-            {/* <Card className="hidden sm:block">
-              <CardHeader>
-                <CardTitle>Account Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Current Plan</span>
-                    <span className="font-medium  text-primary">Free</span>
-                  </div>
-                  <div className="flex justify-between text-sm pb-4">
-                    <span className="text-muted-foreground">Credits Used</span>
-                    <span className="font-medium text-foreground">
-                      7,650 / 10,000
-                    </span>
-                  </div>
-                  <Progress value={76.5} className="h-2" />
-                </div>
-
-                <div className="pt-4 border-t border-border">
-                  <h4 className="text-sm font-medium text-foreground mb-3">
-                    Usage This Month
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">API Calls</span>
-                      <span className="text-foreground">1,234</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Data Exports
-                      </span>
-                      <span className="text-foreground">89</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Saved Searches
-                      </span>
-                      <span className="text-foreground">12</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Performance Chart */}
-            {/* <Card className="hidden lg:block">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    <span>Monthly Performance</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
-                        This month
-                      </span>
-                      <span className="text-2xl font-bold text-foreground">
-                        +23%
-                      </span>
-                    </div>
-                    <div className="h-32 bg-gradient-to-r from-primary/20 to-primary-glow/20 rounded-lg flex items-end justify-center p-4">
-                      <div className="text-center">
-                        <div className="text-sm text-muted-foreground">
-                          Extraction Success Rate
-                        </div>
-                        <div className="text-3xl font-bold text-primary">
-                          94.5%
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card> */}
-            {/* </div> */}
           </div>
         </main>
       </div>
