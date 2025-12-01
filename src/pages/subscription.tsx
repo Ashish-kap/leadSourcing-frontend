@@ -112,7 +112,7 @@ const Subscription: React.FC = () => {
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "100000 contacts / month",
+        "Unlimited contacts",
         "Complete business profiles",
         "All export formats",
         "Priority support",
