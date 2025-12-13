@@ -16,6 +16,7 @@ export interface scrapeJobPostRequest {
   reviewsWithinLastYears?: number | null;
   isExtractEmail?: boolean;
   isValidate?: boolean;
+  avoidDuplicate?: boolean;
   extractNegativeReviews?: boolean;
 }
 
