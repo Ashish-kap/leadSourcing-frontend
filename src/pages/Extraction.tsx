@@ -81,6 +81,7 @@ export const Extraction: React.FC = () => {
     reviewsWithinLastYears: null as number | null,
     isExtractEmail: true,
     isValidate: false,
+    avoidDuplicate: false,
     extractNegativeReviews: false,
   });
 
@@ -190,6 +191,13 @@ export const Extraction: React.FC = () => {
     setFormData((prev) => ({
       ...prev,
       isValidate: checked === true,
+    }));
+  };
+
+  const handleAvoidDuplicateCheckboxChange = (checked: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      avoidDuplicate: checked === true,
     }));
   };
 
@@ -303,6 +311,7 @@ export const Extraction: React.FC = () => {
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
       isExtractEmail: formData.isExtractEmail,
       isValidate: formData.isValidate,
+      avoidDuplicate: formData.avoidDuplicate,
       extractNegativeReviews: formData.extractNegativeReviews,
     };
 
@@ -355,7 +364,7 @@ export const Extraction: React.FC = () => {
         }
 
         // Boolean fields
-        if (key === "isExtractEmail" || key === "isValidate" || key === "extractNegativeReviews") {
+        if (key === "isExtractEmail" || key === "isValidate" || key === "avoidDuplicate" || key === "extractNegativeReviews") {
           return typeof value === "boolean";
         }
 
@@ -373,6 +382,7 @@ export const Extraction: React.FC = () => {
         max_records: formData.maxRecords || 0,
         extract_email: formData.isExtractEmail,
         validate_data: formData.isValidate,
+        avoid_duplicates: formData.avoidDuplicate,
         extract_negative_reviews: formData.extractNegativeReviews,
       });
 
@@ -421,6 +431,7 @@ export const Extraction: React.FC = () => {
       reviewsWithinLastYears: null,
       isExtractEmail: true,
       isValidate: false, // Always start as false since it depends on email extraction
+      avoidDuplicate: false,
       extractNegativeReviews: false,
     });
     setLocation({
@@ -770,8 +781,8 @@ export const Extraction: React.FC = () => {
                     </div>
 
                     {/* Email Extraction & Validation Options */}
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8">
-                      <div className="flex items-center space-x-3">
+                    <div className="flex flex-wrap gap-4">
+                      <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
                           id="isExtractEmail"
                           checked={formData.isExtractEmail}
@@ -800,7 +811,7 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
                           id="isValidate"
                           checked={formData.isValidate}
@@ -838,7 +849,36 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-3 flex-shrink-0">
+                        <Checkbox
+                          id="avoidDuplicate"
+                          checked={formData.avoidDuplicate}
+                          onCheckedChange={handleAvoidDuplicateCheckboxChange}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="avoidDuplicate"
+                            className="cursor-pointer"
+                          >
+                            Avoid duplicates from previous searches
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Enable this option to exclude businesses that have
+                                already been extracted in previous searches. This helps
+                                prevent duplicate entries in your database and ensures
+                                unique data collection.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
                           id="extractNegativeReviews"
                           checked={formData.extractNegativeReviews}
@@ -865,6 +905,7 @@ export const Extraction: React.FC = () => {
                           </Tooltip>
                         </div>
                       </div>
+
                     </div>
 
                     {/* Action Buttons */}
