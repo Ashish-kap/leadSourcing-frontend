@@ -83,6 +83,7 @@ export const Extraction: React.FC = () => {
     isValidate: false,
     avoidDuplicate: false,
     extractNegativeReviews: false,
+    onlyWithoutWebsite: false,
   });
 
   const [location, setLocation] = useState<LocationState>({
@@ -208,6 +209,15 @@ export const Extraction: React.FC = () => {
     }));
   };
 
+  const handleOnlyWithoutWebsiteCheckboxChange = (checked: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      onlyWithoutWebsite: checked === true,
+      isExtractEmail: checked === true ? false : prev.isExtractEmail,
+      isValidate: checked === true ? false : prev.isValidate,
+    }));
+  };
+
   const handleRatingOperatorChange = (
     operator: "gt" | "lt" | "gte" | "lte"
   ) => {
@@ -313,6 +323,7 @@ export const Extraction: React.FC = () => {
       isValidate: formData.isValidate,
       avoidDuplicate: formData.avoidDuplicate,
       extractNegativeReviews: formData.extractNegativeReviews,
+      onlyWithoutWebsite: formData.onlyWithoutWebsite,
     };
 
     const scrapeRequest = Object.fromEntries(
@@ -364,7 +375,7 @@ export const Extraction: React.FC = () => {
         }
 
         // Boolean fields
-        if (key === "isExtractEmail" || key === "isValidate" || key === "avoidDuplicate" || key === "extractNegativeReviews") {
+        if (key === "isExtractEmail" || key === "isValidate" || key === "avoidDuplicate" || key === "extractNegativeReviews" || key === "onlyWithoutWebsite") {
           return typeof value === "boolean";
         }
 
@@ -384,6 +395,7 @@ export const Extraction: React.FC = () => {
         validate_data: formData.isValidate,
         avoid_duplicates: formData.avoidDuplicate,
         extract_negative_reviews: formData.extractNegativeReviews,
+        only_without_website: formData.onlyWithoutWebsite,
       });
 
       const result = await startScraping(scrapeRequest);
@@ -433,6 +445,7 @@ export const Extraction: React.FC = () => {
       isValidate: false, // Always start as false since it depends on email extraction
       avoidDuplicate: false,
       extractNegativeReviews: false,
+      onlyWithoutWebsite: false,
     });
     setLocation({
       countryCode: "",
@@ -787,11 +800,16 @@ export const Extraction: React.FC = () => {
                           id="isExtractEmail"
                           checked={formData.isExtractEmail}
                           onCheckedChange={handleEmailCheckboxChange}
+                          disabled={formData.onlyWithoutWebsite}
                         />
                         <div className="flex items-center space-x-2">
                           <Label
                             htmlFor="isExtractEmail"
-                            className="cursor-pointer"
+                            className={`cursor-pointer ${
+                              formData.onlyWithoutWebsite
+                                ? "text-muted-foreground"
+                                : ""
+                            }`}
                           >
                             Scrape Email
                           </Label>
@@ -805,6 +823,11 @@ export const Extraction: React.FC = () => {
                                 addresses from business listings when available.
                                 This may increase scraping time but provides
                                 additional contact information.
+                                {formData.onlyWithoutWebsite && (
+                                  <span className="block mt-2 text-yellow-600">
+                                    ⚠️ Disabled when "Only Without Website" is enabled
+                                  </span>
+                                )}
                               </p>
                             </TooltipContent>
                           </Tooltip>
@@ -816,13 +839,13 @@ export const Extraction: React.FC = () => {
                           id="isValidate"
                           checked={formData.isValidate}
                           onCheckedChange={handleValidateCheckboxChange}
-                          disabled={!formData.isExtractEmail}
+                          disabled={!formData.isExtractEmail || formData.onlyWithoutWebsite}
                         />
                         <div className="flex items-center space-x-2">
                           <Label
                             htmlFor="isValidate"
                             className={`cursor-pointer ${
-                              !formData.isExtractEmail
+                              !formData.isExtractEmail || formData.onlyWithoutWebsite
                                 ? "text-muted-foreground"
                                 : ""
                             }`}
@@ -841,6 +864,11 @@ export const Extraction: React.FC = () => {
                                 {!formData.isExtractEmail && (
                                   <span className="block mt-2 text-yellow-600">
                                     ⚠️ Requires "Scrape Email" to be enabled
+                                  </span>
+                                )}
+                                {formData.onlyWithoutWebsite && (
+                                  <span className="block mt-2 text-yellow-600">
+                                    ⚠️ Disabled when "Only Without Website" is enabled
                                   </span>
                                 )}
                               </p>
@@ -900,6 +928,35 @@ export const Extraction: React.FC = () => {
                                 Enable this option to extract negative reviews (low ratings) 
                                 from businesses. This can help identify businesses with poor 
                                 customer satisfaction or service quality issues.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 flex-shrink-0">
+                        <Checkbox
+                          id="onlyWithoutWebsite"
+                          checked={formData.onlyWithoutWebsite}
+                          onCheckedChange={handleOnlyWithoutWebsiteCheckboxChange}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="onlyWithoutWebsite"
+                            className="cursor-pointer"
+                          >
+                            Only Without Website
+                          </Label>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Enable this option to filter and extract only businesses
+                                that do not have a website listed. This helps you find
+                                businesses that may need web presence services or have
+                                limited online visibility.
                               </p>
                             </TooltipContent>
                           </Tooltip>
