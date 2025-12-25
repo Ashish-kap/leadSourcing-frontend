@@ -18,6 +18,7 @@ export interface scrapeJobPostRequest {
   isValidate?: boolean;
   avoidDuplicate?: boolean;
   extractNegativeReviews?: boolean;
+  onlyWithoutWebsite?: boolean;
 }
 
 export interface scrapeJobPostResponse {
