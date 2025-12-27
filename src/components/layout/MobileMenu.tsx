@@ -11,7 +11,7 @@ import {
   LogOut,
   Menu,
   X,
-  Map,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -69,9 +69,14 @@ export const MobileMenu: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                {/* <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                   <Map className="w-5 h-5 text-primary-foreground" />
-                </div>
+                </div> */}
+                <div
+              className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
+            >
+              <MapPin className="h-5 w-5 text-white" />
+            </div>
                 <div>
                   <h1 className="text-lg font-bold text-foreground">
                     CazaLead
