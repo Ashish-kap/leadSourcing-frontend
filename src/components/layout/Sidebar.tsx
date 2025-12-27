@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronLeft,
   Map,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -56,8 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Map className="w-5 h-5 text-primary-foreground" />
+            {/* <div className="w-8 h-8 bg-black/30 rounded-lg flex items-center justify-center">
+              <MapPin className="w-5 h-5 text-primary-foreground" />
+            </div> */}
+            <div
+              className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
+            >
+              <MapPin className="h-5 w-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-foreground">CazaLead</h1>

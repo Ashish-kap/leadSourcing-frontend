@@ -1,0 +1,348 @@
+/* Premium Light Login with Geometric Patterns */
+
+.login-bg {
+  position: relative;
+  min-height: 100vh;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Animated Grid Background */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.03) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1.5px, transparent 1.5px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+/* Hexagon Pattern Overlay */
+.hex-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%236366f1' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E");
+  background-size: 60px 52px;
+  pointer-events: none;
+}
+
+/* Geometric Shapes */
+.geo-shape {
+  position: absolute;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  animation: float-rotate 20s ease-in-out infinite;
+}
+
+.geo-circle-1 {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  top: -100px;
+  right: -50px;
+  border-width: 2px;
+  border-color: rgba(99, 102, 241, 0.1);
+}
+
+.geo-circle-2 {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  bottom: 10%;
+  left: -50px;
+  animation-delay: -5s;
+}
+
+.geo-circle-3 {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  top: 40%;
+  left: 20%;
+  animation-delay: -10s;
+  border-style: dashed;
+}
+
+.geo-square-1 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  right: 35%;
+  transform: rotate(45deg);
+  animation: float-rotate-square 25s ease-in-out infinite;
+}
+
+.geo-square-2 {
+  width: 60px;
+  height: 60px;
+  bottom: 25%;
+  left: 35%;
+  transform: rotate(15deg);
+  animation: float-rotate-square 20s ease-in-out infinite reverse;
+  animation-delay: -3s;
+}
+
+.geo-triangle {
+  width: 0;
+  height: 0;
+  border: none;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 70px solid rgba(99, 102, 241, 0.05);
+  top: 15%;
+  left: 10%;
+  animation: float-rotate 18s ease-in-out infinite;
+  animation-delay: -7s;
+}
+
+@keyframes float-rotate {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(10px, -15px) rotate(5deg);
+  }
+  50% {
+    transform: translate(-5px, 10px) rotate(-3deg);
+  }
+  75% {
+    transform: translate(-10px, -5px) rotate(2deg);
+  }
+}
+
+@keyframes float-rotate-square {
+  0%, 100% {
+    transform: rotate(45deg) translate(0, 0);
+  }
+  25% {
+    transform: rotate(50deg) translate(5px, -10px);
+  }
+  50% {
+    transform: rotate(42deg) translate(-8px, 5px);
+  }
+  75% {
+    transform: rotate(48deg) translate(3px, 8px);
+  }
+}
+
+/* Gradient Accent Lines */
+.accent-line {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  animation: line-pulse 3s ease-in-out infinite;
+}
+
+.accent-line-1 {
+  width: 200px;
+  top: 30%;
+  left: 5%;
+  transform: rotate(-15deg);
+}
+
+.accent-line-2 {
+  width: 150px;
+  bottom: 20%;
+  right: 40%;
+  transform: rotate(10deg);
+  animation-delay: -1s;
+}
+
+.accent-line-3 {
+  width: 100px;
+  top: 60%;
+  left: 30%;
+  transform: rotate(-5deg);
+  animation-delay: -2s;
+}
+
+@keyframes line-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Dot Pattern */
+.dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(99, 102, 241, 0.08) 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
+  mask-image: radial-gradient(ellipse 60% 60% at 30% 50%, black 20%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Premium Card */
+.login-card-light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 
+    0 25px 60px -15px rgba(99, 102, 241, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-card-light:hover {
+  box-shadow: 
+    0 35px 70px -15px rgba(99, 102, 241, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Brand Side */
+.brand-side-light {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #818cf8 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-side-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Geometric shapes on brand side */
+.brand-geo {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.brand-hex-1 {
+  width: 120px;
+  height: 120px;
+  top: 10%;
+  right: 10%;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(255, 255, 255, 0.05);
+  animation: brand-float 15s ease-in-out infinite;
+}
+
+.brand-hex-2 {
+  width: 80px;
+  height: 80px;
+  bottom: 15%;
+  left: 15%;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(255, 255, 255, 0.03);
+  animation: brand-float 12s ease-in-out infinite reverse;
+}
+
+.brand-line-1 {
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  top: 25%;
+  left: 20%;
+  transform: rotate(-20deg);
+}
+
+.brand-line-2 {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  bottom: 30%;
+  right: 20%;
+  transform: rotate(15deg);
+}
+
+@keyframes brand-float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-10px, 15px) rotate(10deg);
+  }
+}
+
+/* Gradient Text */
+.gradient-text-light {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium Button */
+.google-btn-light {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  box-shadow: 
+    0 4px 15px -3px rgba(99, 102, 241, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.google-btn-light:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 8px 25px -5px rgba(99, 102, 241, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+  transform: translateY(-2px);
+}
+
+/* Trust Badge */
+.trust-badge-light {
+  padding: 8px 14px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.08);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.trust-badge-light:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .geo-circle-1 {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .geo-circle-2 {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .geo-circle-3 {
+    display: none;
+  }
+  
+  .geo-square-1,
+  .geo-square-2,
+  .geo-triangle {
+    display: none;
+  }
+  
+  .accent-line {
+    display: none;
+  }
+}
