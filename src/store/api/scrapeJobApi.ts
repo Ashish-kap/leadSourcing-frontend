@@ -1,6 +1,7 @@
 import { apiSlice } from "./apiSlice";
 import {
   GetJobsResponse,
+  GetJobsQueryParams,
   scrapeJobPostRequest,
   scrapeJobPostResponse,
 } from "./types/scrapeJob";
@@ -22,13 +23,33 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Auth", "User", "Jobs"],
     }),
     // GET /jobs
-    getJobs: builder.query<GetJobsResponse["data"], void>({
-      query: () => "/jobs",
-      transformResponse: (response: GetJobsResponse) => response.data,
+    getJobs: builder.query<GetJobsResponse, GetJobsQueryParams | void>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        
+        if (params) {
+          if (params.page) queryParams.append("page", params.page.toString());
+          if (params.limit) queryParams.append("limit", params.limit.toString());
+          if (params.status) queryParams.append("status", params.status);
+          if (params.keyword) queryParams.append("keyword", params.keyword);
+          if (params.startDate) queryParams.append("startDate", params.startDate);
+          if (params.endDate) queryParams.append("endDate", params.endDate);
+          if (params.sort) queryParams.append("sort", params.sort);
+          else if (params.sortBy) {
+            const order = params.order || "desc";
+            queryParams.append("sortBy", params.sortBy);
+            queryParams.append("order", order);
+          }
+        }
+        
+        const queryString = queryParams.toString();
+        return `/jobs${queryString ? `?${queryString}` : ""}`;
+      },
+      transformResponse: (response: GetJobsResponse) => response,
       providesTags: (result) =>
-        result?.jobs
+        result?.data
           ? [
-              ...result.jobs.map(({ id }) => ({ type: "Jobs" as const, id })),
+              ...result.data.map(({ id }) => ({ type: "Jobs" as const, id })),
               { type: "Jobs", id: "LIST" },
             ]
           : [{ type: "Jobs", id: "LIST" }],
