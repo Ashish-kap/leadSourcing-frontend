@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   // Bell,
   // User,
@@ -28,6 +29,7 @@ import { toast } from "sonner";
 
 export const Header: React.FC = () => {
   const { user, logout, isLoading: isLoggingOut } = useAuth();
+  const navigate = useNavigate();
 
   // Helper function to get user initials
   const getUserInitials = (name: string) => {
@@ -136,7 +138,10 @@ export const Header: React.FC = () => {
             {user?.user?.plan !== "business" && (
               <>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate("/subscription")}
+                    className="cursor-pointer"
+                  >
                     <Sparkles className="mr-2 h-4 w-4" />
                     Upgrade to Business
                   </DropdownMenuItem>

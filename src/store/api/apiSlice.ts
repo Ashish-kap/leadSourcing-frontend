@@ -12,6 +12,7 @@ const mutex = new Mutex();
 // Base URL configuration
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
+  credentials: "include", // Include cookies in cross-origin requests
   prepareHeaders: (headers, {}) => {
     const token = localStorage.getItem("authToken");
 

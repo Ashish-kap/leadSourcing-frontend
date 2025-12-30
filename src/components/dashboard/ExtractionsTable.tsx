@@ -4,7 +4,6 @@ import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   flexRender,
   ColumnDef,
@@ -73,8 +72,13 @@ interface Extraction {
   maxRecords: number;
   recordsCollected?: number;
   createdAt: string;
+  startedAt: string;
   completedAt: string | null;
-  duration: number | null;
+  duration: {
+    raw: number;
+    seconds: number;
+    formatted: string;
+  };
 }
 
 const statusColors: Record<string, string> = {
@@ -91,7 +95,12 @@ const statusColors: Record<string, string> = {
 export const ExtractionsTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [, setIsMobile] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [realtimeProgress, setRealtimeProgress] = useState<
@@ -104,23 +113,33 @@ export const ExtractionsTable: React.FC = () => {
   } | null>(null);
   const navigate = useNavigate();
 
+  const sort = "-createdAt"; // Default sort
+
   const {
     data: jobsData,
-    refetch: refetchJobs, // ADD: refetch function
-  } = useGetJobsQuery();
+    isFetching,
+    refetch: refetchJobs,
+  } = useGetJobsQuery({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    keyword: query || undefined,
+    sort,
+  });
 
   const { refetch: refetchUser } = useGetCurrentUserQuery();
 
   const [deleteJob, { isLoading: isDeletingJob }] = useDeleteJobMutation();
 
-  // Debug: Log jobsData to see what's actually being received
-  useEffect(() => {
-    if (jobsData?.jobs) {
-      jobsData.jobs.forEach(() => {
-        // Process job data as needed
-      });
-    }
-  }, [jobsData]);
+  const pageInfo = jobsData || {
+    data: [],
+    page: 1,
+    limit: pagination.pageSize,
+    totalPages: 1,
+    total: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
 
   // FIXED: Proper Socket.IO connection management
   useEffect(() => {
@@ -211,7 +230,7 @@ export const ExtractionsTable: React.FC = () => {
       newSocket.disconnect();
       setIsConnected(false);
     };
-  }, []);
+  }, [refetchJobs, refetchUser]);
 
   // handle mobile layout
   useEffect(() => {
@@ -222,7 +241,7 @@ export const ExtractionsTable: React.FC = () => {
   }, []);
 
   // extract job list or empty
-  const data: Extraction[] = useMemo(() => jobsData?.jobs ?? [], [jobsData]);
+  const data: Extraction[] = useMemo(() => pageInfo.data ?? [], [pageInfo]);
 
   const handleDeleteJob = async (jobId: string, jobKeyword: string) => {
     try {
@@ -520,15 +539,22 @@ export const ExtractionsTable: React.FC = () => {
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, globalFilter },
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter: query,
+      pagination,
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: setQuery,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 5 } },
+    manualPagination: true,
+    pageCount: pageInfo.totalPages,
+    rowCount: pageInfo.total,
   });
 
   const connectionStatus = isConnected ? (
@@ -554,20 +580,20 @@ export const ExtractionsTable: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search extractions..."
-                  value={globalFilter ?? ""}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    table.setPageIndex(0);
+                  }}
                   className="pl-10 w-full"
                 />
               </div>
               <Select
-                value={
-                  (table.getColumn("status")?.getFilterValue() as string) ?? ""
-                }
-                onValueChange={(value) =>
-                  table
-                    .getColumn("status")
-                    ?.setFilterValue(value === "all" ? "" : value)
-                }
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  table.setPageIndex(0);
+                }}
               >
                 <SelectTrigger className="w-full sm:w-40">
                   <Filter className="h-4 w-4 mr-2" />
@@ -663,17 +689,36 @@ export const ExtractionsTable: React.FC = () => {
               {Math.min(
                 (table.getState().pagination.pageIndex + 1) *
                   table.getState().pagination.pageSize,
-                table.getFilteredRowModel().rows.length
+                pageInfo.total || 0
               )}{" "}
-              of {table.getFilteredRowModel().rows.length} results
+              of {pageInfo.total || 0} results
             </div>
-            <div className="flex items-center justify-center space-x-2">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-sm text-muted-foreground">Rows per page:</span>
+              <Select
+                value={`${table.getState().pagination.pageSize}`}
+                onValueChange={(value) => {
+                  table.setPageSize(Number(value));
+                  table.setPageIndex(0);
+                }}
+              >
+                <SelectTrigger className="h-8 w-[70px]">
+                  <SelectValue placeholder={table.getState().pagination.pageSize} />
+                </SelectTrigger>
+                <SelectContent side="top">
+                  {[5, 10, 15, 20, 30, 50].map((pageSize) => (
+                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                      {pageSize}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className="flex items-center space-x-1"
+                className="flex items-center space-x-1 cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span className="hidden sm:inline">Previous</span>
@@ -683,7 +728,7 @@ export const ExtractionsTable: React.FC = () => {
                 size="sm"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className="flex items-center space-x-1"
+                className="flex items-center space-x-1 cursor-pointer"
               >
                 <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="h-4 w-4" />

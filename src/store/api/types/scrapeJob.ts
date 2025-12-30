@@ -37,22 +37,35 @@ export interface Job {
   maxRecords: number;
   recordsCollected?: number;
   createdAt: string;
+  startedAt: string;
   completedAt: string | null;
-  duration: number | null;
+  duration: {
+    raw: number;
+    seconds: number;
+    formatted: string;
+  };
 }
 
-export interface Pagination {
-  currentPage: number;
-  totalPages: number;
-  totalJobs: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
+export interface GetJobsQueryParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  keyword?: string;
+  startDate?: string;
+  endDate?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  sort?: string;
 }
 
 export interface GetJobsResponse {
-  success: boolean;
-  data: {
-    jobs: Job[];
-    pagination: Pagination;
-  };
+  status: "success" | "error";
+  results: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  total: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  data: Job[];
 }

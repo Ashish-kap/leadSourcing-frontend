@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import {
   initializeGoogleAuth,
   signInWithGooglePopup,
 } from "@/utils/googleAuth";
+import { setCookie } from "@/utils/cookies";
 import "../login.css";
 
 const Login = () => {
@@ -19,12 +20,21 @@ const Login = () => {
     isGoogleLoggingIn,
   } = useAuth();
   const navigate = useNavigate();
-  // const [formData, setFormData] = useState({
-  //   email: "",
-  //   password: "",
-  // });
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [rememberMe, setRememberMe] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Capture and store referral code from query parameter
+  useEffect(() => {
+    const refCode = searchParams.get("ref");
+    if (refCode) {
+      // Store ref code in cookie for 30 days
+      // Set secure and sameSite for production compatibility
+      setCookie("ref", refCode, 30, {
+        path: "/",
+        secure: window.location.protocol === "https:",
+        sameSite: "lax",
+      });
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Initialize Google Auth when component mounts
