@@ -33,7 +33,7 @@ const menuItems = [
 
 export const MobileMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout, isLoggingOut } = useAuth();
+  const { logout, isLoggingOut } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
