@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/store/hooks/useAuth";
+import { AffiliateCard } from "@/components/affiliate/AffiliateCard";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -118,12 +119,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
           ))}
       </nav>
 
+      
+
       {/* Logout */}
       <div className="absolute bottom-4 left-2 right-2">
+        {/* Affiliate Program Card */}
+      {!isCollapsed && <AffiliateCard />}
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer",
+            "w-full justify-start text-destructive bg-destructive/10 hover:bg-accent hover:text-accent-foreground cursor-pointer",
             isCollapsed && "justify-center px-3"
           )}
           onClick={handleSubmit}

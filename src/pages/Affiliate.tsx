@@ -339,7 +339,7 @@ const Affiliate = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
           {/* Header */}
           <header className="mb-6 sm:mb-8 lg:mb-10">
-            <h1 className="text-2xl sm:text-3xl lg:text-3xl font-semibold text-foreground mb-1 sm:mb-2">
+            <h1 className="text-2xl sm:text-2xl lg:text-2xl font-semibold text-foreground mb-1 sm:mb-2">
               Affiliate Program
             </h1>
             <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
@@ -418,7 +418,7 @@ const Affiliate = () => {
         
         {/* ========== HEADER ========== */}
         <header className="mb-6 sm:mb-8 lg:mb-10">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 sm:mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground mb-1 sm:mb-2">
             Affiliate Program
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">

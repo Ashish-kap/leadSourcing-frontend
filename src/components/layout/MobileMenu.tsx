@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/store/hooks/useAuth";
+import { AffiliateCard } from "@/components/affiliate/AffiliateCard";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -126,11 +127,15 @@ export const MobileMenu: React.FC = () => {
                 ))}
             </nav>
 
+            
+
             {/* Logout */}
             <div className="absolute bottom-4 left-2 right-2">
+              {/* Affiliate Program Card */}
+            <AffiliateCard />
               <Button
                 variant="ghost"
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="w-full justify-start text-destructive bg-destructive/10 hover:bg-accent hover:text-accent-foreground"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
