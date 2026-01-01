@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   MapPin,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const menuItems = [
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   { icon: CreditCard, label: "Subscription", href: "/subscription" },
+  { icon: Users, label: "Affiliate", href: "/affiliate" },
   { icon: Settings, label: "Account", href: "/account" },
 
   // { icon: HelpCircle, label: "Help & Support", href: "/help" },

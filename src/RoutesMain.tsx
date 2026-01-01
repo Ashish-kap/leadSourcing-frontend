@@ -9,6 +9,7 @@ import Extraction from "./pages/Extraction";
 import NotFound from "./pages/NotFound";
 import Subscription from "./pages/subscription";
 import Account from "./pages/Account";
+import Affiliate from "./pages/Affiliate";
 // import Privacy from "./pages/privacy";
 // import TermsOfService from "./pages/TermsOfService";
 
@@ -23,6 +24,7 @@ const RoutesMain = () => (
       <Route path="/" element={<Dashboard />} />
       <Route path="/extraction" element={<Extraction />} />
       <Route path="/subscription" element={<Subscription />} />
+      <Route path="/affiliate" element={<Affiliate />} />
       <Route path="/account" element={<Account />} />
     </Route>
     <Route path="*" element={<NotFound />} />
