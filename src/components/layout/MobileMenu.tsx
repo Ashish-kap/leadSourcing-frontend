@@ -12,11 +12,13 @@ import {
   Menu,
   X,
   MapPin,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/store/hooks/useAuth";
+import { AffiliateCard } from "@/components/affiliate/AffiliateCard";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -24,6 +26,7 @@ const menuItems = [
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   { icon: CreditCard, label: "Subscription", href: "/subscription" },
+  { icon: Users, label: "Affiliate", href: "/affiliate" },
   { icon: Settings, label: "Account", href: "/account" },
 
   // { icon: HelpCircle, label: "Help & Support", href: "/help" },
@@ -31,7 +34,7 @@ const menuItems = [
 
 export const MobileMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout, isLoggingOut } = useAuth();
+  const { logout, isLoggingOut } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,11 +127,15 @@ export const MobileMenu: React.FC = () => {
                 ))}
             </nav>
 
+            
+
             {/* Logout */}
             <div className="absolute bottom-4 left-2 right-2">
+              {/* Affiliate Program Card */}
+            <AffiliateCard />
               <Button
                 variant="ghost"
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="w-full justify-start text-destructive bg-destructive/10 hover:bg-accent hover:text-accent-foreground"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >

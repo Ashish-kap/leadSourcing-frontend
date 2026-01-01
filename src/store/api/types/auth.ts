@@ -33,6 +33,7 @@ export interface User {
   __v: number;
   creditPercentage: string;
   id: string;
+  referralCode?: string;
 }
 
 export interface ExtractionStats {
