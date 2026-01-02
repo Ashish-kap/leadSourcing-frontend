@@ -26,12 +26,16 @@ const Login = () => {
   useEffect(() => {
     const refCode = searchParams.get("ref");
     if (refCode) {
+      // Detect production environment
+      const isProduction = window.location.hostname.includes("cazalead.com");
+      
       // Store ref code in cookie for 30 days
       // Set secure and sameSite for production compatibility
       setCookie("ref", refCode, 30, {
         path: "/",
         secure: window.location.protocol === "https:",
         sameSite: "lax",
+        ...(isProduction && { domain: ".cazalead.com" }),
       });
     }
   }, [searchParams]);
