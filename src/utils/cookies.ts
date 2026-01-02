@@ -7,7 +7,6 @@ export interface CookieOptions {
   path?: string;
   secure?: boolean;
   sameSite?: "strict" | "lax" | "none";
-  domain?: string;
 }
 
 /**
@@ -15,7 +14,7 @@ export interface CookieOptions {
  * @param name - Cookie name
  * @param value - Cookie value
  * @param days - Number of days until expiration
- * @param options - Optional cookie settings (path, secure, sameSite, domain)
+ * @param options - Optional cookie settings (path, secure, sameSite)
  */
 export const setCookie = (
   name: string,
@@ -32,10 +31,6 @@ export const setCookie = (
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
 
   let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=${options?.path || "/"}`;
-
-  if (options?.domain) {
-    cookieString += `;domain=${options.domain}`;
-  }
 
   if (options?.secure) {
     cookieString += ";secure";
