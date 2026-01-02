@@ -6,6 +6,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
+import { getCookie } from "@/utils/cookies";
 
 const mutex = new Mutex();
 
@@ -18,6 +19,12 @@ const baseQuery = fetchBaseQuery({
 
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
+    }
+
+    // Add referral code from cookie to headers as backup
+    const refCode = getCookie("ref");
+    if (refCode) {
+      headers.set("X-Referral-Code", refCode);
     }
 
     return headers;
