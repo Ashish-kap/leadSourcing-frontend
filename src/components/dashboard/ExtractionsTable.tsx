@@ -62,6 +62,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
+import { Country, State } from "country-state-city";
 
 interface Extraction {
   id: string;
@@ -91,6 +92,74 @@ const statusColors: Record<string, string> = {
   data_not_found: "bg-muted text-muted-foreground",
 };
 
+function locationToFilenamePart(locationStr: string): string {
+  const toReadable = (s: string) =>
+    (s || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const raw = (locationStr || "").trim();
+  if (!raw) return "(unknown)";
+  const parts = raw.split(",").map((p) => p.trim()).filter(Boolean);
+  const countryCodeForLookup = (code: string) =>
+    code.toUpperCase() === "UK" ? "GB" : code.toUpperCase();
+  if (parts.length >= 3) {
+    const countryCodeRaw = parts[parts.length - 1];
+    const stateCodeRaw = parts[parts.length - 2];
+    const countryCode = countryCodeForLookup(countryCodeRaw);
+    const stateCode = stateCodeRaw.toUpperCase();
+    const city = parts.slice(0, -2).join(" ");
+    const country = Country.getCountryByCode(countryCode);
+    const state = State.getStateByCodeAndCountry(stateCode, countryCode);
+    const cityReadable = toReadable(city);
+    const stateReadable = state?.name
+      ? toReadable(state.name)
+      : toReadable(stateCodeRaw);
+    const countryReadable = country?.name
+      ? toReadable(country.name)
+      : toReadable(countryCodeRaw);
+    return `(${cityReadable}, ${stateReadable}, ${countryReadable})`;
+  }
+  if (parts.length === 2) {
+    const countryCodeRaw = parts[1];
+    const countryCode = countryCodeForLookup(countryCodeRaw);
+    const country = Country.getCountryByCode(countryCode);
+    const state = State.getStateByCodeAndCountry(
+      parts[0].toUpperCase(),
+      countryCode
+    );
+    const stateOrCityReadable = state?.name
+      ? toReadable(state.name)
+      : toReadable(parts[0]);
+    const countryReadable = country?.name
+      ? toReadable(country.name)
+      : toReadable(countryCodeRaw);
+    return `(${stateOrCityReadable}, ${countryReadable})`;
+  }
+  const countryCode = countryCodeForLookup(parts[0]);
+  const country = Country.getCountryByCode(countryCode);
+  const countryReadable = country?.name
+    ? toReadable(country.name)
+    : toReadable(parts[0]);
+  return `(${countryReadable})`;
+}
+
+function buildDownloadFileName(
+  extraction: Pick<
+    Extraction,
+    "keyword" | "location" | "createdAt" | "completedAt"
+  >
+): string {
+  const sanitize = (s: string) =>
+    (s || "")
+      .toLowerCase()
+      .replace(/[\s,\/]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  const keyword = sanitize(extraction.keyword);
+  const location = locationToFilenamePart(extraction.location);
+  const dateStr = extraction.completedAt
+    ? new Date(extraction.completedAt).toISOString().slice(0, 10)
+    : new Date(extraction.createdAt).toISOString().slice(0, 10);
+  return `${keyword}-${location}-${dateStr}.csv`;
+}
 
 export const ExtractionsTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -117,7 +186,6 @@ export const ExtractionsTable: React.FC = () => {
 
   const {
     data: jobsData,
-    isFetching,
     refetch: refetchJobs,
   } = useGetJobsQuery({
     page: pagination.pageIndex + 1,
@@ -463,7 +531,7 @@ export const ExtractionsTable: React.FC = () => {
                       // First download the CSV
                       downloadCsv(
                         row.original.id,
-                        `${row.original.keyword}-extraction.csv`
+                        buildDownloadFileName(row.original)
                       );
                       // Then open feedback modal
                       handleDownloadWithFeedback(
