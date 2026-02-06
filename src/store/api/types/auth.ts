@@ -34,6 +34,10 @@ export interface User {
   creditPercentage: string;
   id: string;
   referralCode?: string;
+  designation?: string;
+  website?: string;
+  howDidYouHearAbout?: string;
+  userInfo?: boolean;
 }
 
 export interface ExtractionStats {
