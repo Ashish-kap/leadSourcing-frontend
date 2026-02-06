@@ -271,12 +271,12 @@ export const Extraction: React.FC = () => {
     }
 
     // Check plan limits for free users (fallback check)  -- tempory disable for 24hrs offer
-    // if (userData?.user.plan === "free" && formData.maxRecords > 50) {
-    //   toast.error(
-    //     "Free plans are limited to 50 records. Please upgrade to Business plan for more extractions."
-    //   );
-    //   return;
-    // }
+    if (userData?.user.plan === "free" && formData.maxRecords > 500) {
+      toast.error(
+        "Free plans are limited to 500 records. Please upgrade to Business plan for more extractions."
+      );
+      return;
+    }
 
     // Validate reviewTimeRange if provided
     if (
