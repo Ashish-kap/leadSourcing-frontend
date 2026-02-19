@@ -642,7 +642,7 @@ export const Extraction: React.FC = () => {
                         />
                       </div>
 
-                      <div className="space-y-2">
+                      {/* <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="reviewTimeRange">
                             Reviews Within Last (years)
@@ -670,7 +670,7 @@ export const Extraction: React.FC = () => {
                           max="10"
                           placeholder="eg. 5"
                         />
-                      </div>
+                      </div> */}
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
@@ -725,7 +725,7 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
+                      {/* <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="reviewOperator">
                             Review Count Filter
@@ -777,7 +777,7 @@ export const Extraction: React.FC = () => {
                             placeholder="eg. 100"
                           />
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* <div className="space-y-2">
                       <Label htmlFor="reviewsWithinLastYears">
@@ -908,7 +908,7 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3 flex-shrink-0">
+                      {/* <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
                           id="extractNegativeReviews"
                           checked={formData.extractNegativeReviews}
@@ -934,7 +934,7 @@ export const Extraction: React.FC = () => {
                             </TooltipContent>
                           </Tooltip>
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
