@@ -642,7 +642,7 @@ export const Extraction: React.FC = () => {
                         />
                       </div>
 
-                      {/* <div className="space-y-2">
+                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="reviewTimeRange">
                             Reviews Within Last (years)
@@ -670,7 +670,7 @@ export const Extraction: React.FC = () => {
                           max="10"
                           placeholder="eg. 5"
                         />
-                      </div> */}
+                      </div> 
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
@@ -725,7 +725,7 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* <div className="space-y-2">
+                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="reviewOperator">
                             Review Count Filter
@@ -777,22 +777,7 @@ export const Extraction: React.FC = () => {
                             placeholder="eg. 100"
                           />
                         </div>
-                      </div> */}
-
-                      {/* <div className="space-y-2">
-                      <Label htmlFor="reviewsWithinLastYears">
-                        Reviews Within Last (years)
-                      </Label>
-                      <Input
-                        id="reviewsWithinLastYears"
-                        name="reviewsWithinLastYears"
-                        type="number"
-                        value={formData.reviewsWithinLastYears}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="10"
-                      />
-                    </div> */}
+                      </div> 
                     </div>
 
                     {/* Email Extraction & Validation Options */}
@@ -908,7 +893,7 @@ export const Extraction: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* <div className="flex items-center space-x-3 flex-shrink-0">
+                      <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
                           id="extractNegativeReviews"
                           checked={formData.extractNegativeReviews}
@@ -934,7 +919,7 @@ export const Extraction: React.FC = () => {
                             </TooltipContent>
                           </Tooltip>
                         </div>
-                      </div> */}
+                      </div> 
 
                       <div className="flex items-center space-x-3 flex-shrink-0">
                         <Checkbox
@@ -1048,223 +1033,6 @@ export const Extraction: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
-
-              {/* <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-3">
-                  <MapPin className="h-6 w-6 text-primary" />
-                  <span>Google Maps Data Extraction</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="keyword" className="text-sm font-medium">
-                    Search Keyword
-                  </Label>
-                  <Input
-                    id="keyword"
-                    placeholder="e.g., Restaurants, Plumbers"
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    className="text-base h-12"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter the type of business or service you want to extract
-                    data for
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="country" className="text-sm font-medium">
-                      Country
-                    </Label>
-                    <Select
-                      value={selectedCountry}
-                      onValueChange={setSelectedCountry}
-                    >
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select Country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries.map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="state" className="text-sm font-medium">
-                      State
-                    </Label>
-                    <Select
-                      value={selectedState}
-                      onValueChange={setSelectedState}
-                    >
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {states.map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="city" className="text-sm font-medium">
-                      City
-                    </Label>
-                    <Select
-                      value={selectedCity}
-                      onValueChange={setSelectedCity}
-                    >
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select City" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="border-t border-border pt-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
-                    <Filter className="h-5 w-5 text-primary" />
-                    <span>Advanced Filters</span>
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <Label>Search Radius</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="5 km" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 km</SelectItem>
-                          <SelectItem value="5">5 km</SelectItem>
-                          <SelectItem value="10">10 km</SelectItem>
-                          <SelectItem value="25">25 km</SelectItem>
-                          <SelectItem value="50">50 km</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Minimum Rating</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Any Rating" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="any">Any Rating</SelectItem>
-                          <SelectItem value="3">3+ Stars</SelectItem>
-                          <SelectItem value="4">4+ Stars</SelectItem>
-                          <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Minimum Reviews</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Any" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="any">Any</SelectItem>
-                          <SelectItem value="10">10+ Reviews</SelectItem>
-                          <SelectItem value="50">50+ Reviews</SelectItem>
-                          <SelectItem value="100">100+ Reviews</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Export Format</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="CSV" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="csv">CSV</SelectItem>
-                          <SelectItem value="excel">Excel</SelectItem>
-                          <SelectItem value="json">JSON</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center pt-6">
-                  <Button
-                    disabled={!selectedCountry || !selectedState || isScraping}
-                    size="lg"
-                    className="w-full max-w-md bg-gradient-primary hover:bg-primary/90 text-primary-foreground shadow-glow h-14 text-lg font-semibold"
-                  >
-                    <Search className="mr-3 h-6 w-6" />
-                    Extract Data Now
-                  </Button>
-                </div>
-              </CardContent>
-            </Card> */}
-
-              {/* Recent Templates */}
-              {/* <Card>
-              <CardHeader>
-                <CardTitle>Recent Templates</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    {
-                      name: "NYC Restaurants",
-                      location: "New York, NY",
-                      category: "Restaurants",
-                    },
-                    {
-                      name: "LA Hotels",
-                      location: "Los Angeles, CA",
-                      category: "Hotels",
-                    },
-                    {
-                      name: "Chicago Gyms",
-                      location: "Chicago, IL",
-                      category: "Fitness",
-                    },
-                  ].map((template, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border border-border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                    >
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-foreground">
-                          {template.name}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          {template.location}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {template.category}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card> */}
             </div>
           </main>
         </div>
