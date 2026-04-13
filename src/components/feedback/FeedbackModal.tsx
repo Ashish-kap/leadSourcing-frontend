@@ -63,12 +63,15 @@ interface GenericFeedbackModalProps {
   showUpgradeButton?: boolean;
   // Additional API for subscription cancellation
   shouldCancelSubscription?: boolean;
+  /** Called after feedback is successfully persisted (not on dismiss or upgrade). */
+  onSuccessfulSubmit?: () => void;
 }
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpgrade?: () => void;
+  onSuccessfulSubmit?: () => void;
 }
 
 // Generic reusable modal component
@@ -88,6 +91,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
   mutation,
   showUpgradeButton = false,
   shouldCancelSubscription = false,
+  onSuccessfulSubmit,
 }) => {
   const { user } = useAuth();
   const [submitMutation, mutationState] = mutation;
@@ -173,6 +177,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
             toast.success(
               "Your subscription will be cancelled at the next billing cycle. Sorry to see you go!"
             );
+            onSuccessfulSubmit?.();
             form.reset();
             onClose();
             // Start background polling to ensure webhook updates are reflected
@@ -182,6 +187,7 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
             toast.info(
               "Subscription cancellation is being processed. You'll be notified when complete."
             );
+            onSuccessfulSubmit?.();
             form.reset();
             onClose();
             // Start background polling for webhook completion
@@ -193,12 +199,14 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
           toast.warning(
             "Feedback submitted, but there was an issue cancelling your subscription. Please contact support."
           );
+          onSuccessfulSubmit?.();
           form.reset();
           onClose();
           return;
         }
       } else {
         // For regular feedback (not subscription cancellation)
+        onSuccessfulSubmit?.();
         toast.success(successMessage);
         form.reset();
         onClose();
@@ -234,13 +242,15 @@ export const GenericFeedbackModal: React.FC<GenericFeedbackModalProps> = ({
     onClose();
   };
 
-  const handleClose = () => {
-    form.reset();
-    onClose();
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      form.reset();
+      onClose();
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
@@ -365,6 +375,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   isOpen,
   onClose,
   onUpgrade,
+  onSuccessfulSubmit,
 }) => {
   const submitFeedbackMutation = useSubmitFeedbackMutation();
 
@@ -373,6 +384,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onUpgrade={onUpgrade}
+      onSuccessfulSubmit={onSuccessfulSubmit}
       title="Share Feedback"
       satisfactionQuestion="Are you satisfied with the search result?"
       textareaLabel="What can we improve?"

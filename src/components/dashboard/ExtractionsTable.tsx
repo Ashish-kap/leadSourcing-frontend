@@ -61,7 +61,6 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { Country, State } from "country-state-city";
 
 interface Extraction {
@@ -175,11 +174,6 @@ export const ExtractionsTable: React.FC = () => {
   const [realtimeProgress, setRealtimeProgress] = useState<
     Record<string, number>
   >({});
-  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-  const [, setSelectedJobForFeedback] = useState<{
-    id: string;
-    keyword: string;
-  } | null>(null);
   const navigate = useNavigate();
 
   const sort = "-createdAt"; // Default sort
@@ -319,21 +313,6 @@ export const ExtractionsTable: React.FC = () => {
       // Delete job error
       toast.error("Failed to delete extraction. Please try again.");
     }
-  };
-
-  const handleDownloadWithFeedback = (jobId: string, keyword: string) => {
-    // Set the selected job for feedback
-    setSelectedJobForFeedback({ id: jobId, keyword });
-    // Open the feedback modal
-    setIsFeedbackModalOpen(true);
-  };
-
-  const handleFeedbackUpgrade = () => {
-    // Navigate to subscription page
-    navigate("/subscription");
-    // Close the feedback modal
-    setIsFeedbackModalOpen(false);
-    setSelectedJobForFeedback(null);
   };
 
   const columns = useMemo<ColumnDef<Extraction>[]>(
@@ -528,15 +507,9 @@ export const ExtractionsTable: React.FC = () => {
                         job_id: row.original.id,
                         records: row.original.recordsCollected ?? 0,
                       });
-                      // First download the CSV
                       downloadCsv(
                         row.original.id,
                         buildDownloadFileName(row.original)
-                      );
-                      // Then open feedback modal
-                      handleDownloadWithFeedback(
-                        row.original.id,
-                        row.original.keyword
                       );
                     }}
                     disabled={isDownloading}
@@ -596,12 +569,7 @@ export const ExtractionsTable: React.FC = () => {
         },
       },
     ],
-    [
-      realtimeProgress,
-      handleDeleteJob,
-      isDeletingJob,
-      handleDownloadWithFeedback,
-    ]
+    [realtimeProgress, handleDeleteJob, isDeletingJob]
   );
 
   const table = useReactTable({
@@ -805,16 +773,6 @@ export const ExtractionsTable: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Feedback Modal */}
-      <FeedbackModal
-        isOpen={isFeedbackModalOpen}
-        onClose={() => {
-          setIsFeedbackModalOpen(false);
-          setSelectedJobForFeedback(null);
-        }}
-        onUpgrade={handleFeedbackUpgrade}
-      />
     </>
   );
 };
