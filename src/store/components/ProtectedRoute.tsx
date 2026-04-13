@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { FeedbackFloatingButton } from "@/components/feedback/FeedbackFloatingButton";
 
 export const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -20,5 +21,10 @@ export const ProtectedRoute = () => {
     );
   }
 
-  return isAuthenticated ? <Outlet /> : null;
+  return isAuthenticated ? (
+    <>
+      <Outlet />
+      <FeedbackFloatingButton />
+    </>
+  ) : null;
 };
