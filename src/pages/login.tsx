@@ -1,9 +1,13 @@
-import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { MapPin, Loader2, Shield, Zap, Lock } from "lucide-react";
+import { MapPin, Loader2, 
+  // Shield, Zap, Lock 
+} from "lucide-react";
 import { useAuth } from "./../store/hooks/useAuth";
 import {
   initializeGoogleAuth,
@@ -14,13 +18,17 @@ import "../login.css";
 
 const Login = () => {
   const {
-    // login,
+    login,
     googleAuth,
-    // isLoggingIn,
+    isLoggingIn,
     isGoogleLoggingIn,
   } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   // Capture and store referral code from query parameter
   useEffect(() => {
@@ -43,33 +51,39 @@ const Login = () => {
     });
   }, []);
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  //   try {
-  //     await login(formData.email, formData.password);
-  //     toast.success("Welcome back! You have been successfully logged in.");
-  //   } catch (error) {
-  //     // Error handling is done in the useAuth hook
-  //   }
-  // };
+    try {
+      await login(formData.email, formData.password);
+      toast.success("Welcome back! You have been successfully logged in.");
+    } catch {
+      // API error toasts are handled centrally via useAuth -> handleApiError.
+    }
+  };
 
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFormData({
-  //     ...formData,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleGoogleLogin = async () => {
     try {
       const googleToken = await signInWithGooglePopup();
-      await googleAuth(googleToken);
+      try {
+        await googleAuth(googleToken);
+      } catch {
+        // API error toasts are handled centrally via useAuth -> handleApiError.
+        return;
+      }
+
       toast.success(
         "Welcome! You have been successfully logged in with Google."
       );
     } catch {
-      // Google login error
+      // Popup/provider failure before the API call.
       toast.error("Google login failed. Please try again.");
     }
   };
@@ -99,10 +113,10 @@ const Login = () => {
         <div className="w-full max-w-md space-y-6 sm:space-y-8">
           {/* Premium Card */}
           <Card className="login-card-light border-0 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl">
-            <CardHeader className="space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-0">
+            <CardHeader className="space-y-4 sm:space-y-6 px-0">
               <div className="text-center">
                 {/* Logo */}
-                <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-6 sm:mb-8">
+                <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-2 sm:mb-2">
                   <div
                     onClick={() => navigate("/")}
                     className="w-10 h-10 sm:w-12 sm:h-12 cursor-pointer bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 transition-transform hover:scale-105"
@@ -116,16 +130,77 @@ const Login = () => {
                     CazaLead
                   </span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-slate-800">
+                {/* <h1 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-slate-800">
                   Welcome Back
-                </h1>
+                </h1> */}
                 <p className="text-slate-500 text-base sm:text-lg leading-relaxed px-2">
-                  Sign in securely with your Google account
+                  Sign in securely with email or Google.
                 </p>
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-6 sm:space-y-8 px-0">
+            <CardContent className="space-y-6 sm:space-y-6 px-0">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    className="h-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-sm text-indigo-500 hover:text-indigo-600 font-medium transition-colors shrink-0"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="h-12"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full h-12 sm:h-14 rounded-xl font-semibold text-sm sm:text-base"
+                  disabled={isLoggingIn}
+                >
+                  {isLoggingIn ? (
+                    <div className="flex items-center justify-center space-x-3">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Signing in...</span>
+                    </div>
+                  ) : (
+                    "Sign in with Email"
+                  )}
+                </Button>
+              </form>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="login-card-light px-2 text-slate-500">Or continue with</span>
+                </div>
+              </div>
+
               <Button
                 size="lg"
                 className="google-btn-light cursor-pointer w-full h-12 sm:h-14 rounded-xl text-slate-700 font-semibold text-sm sm:text-base hover:text-slate-900"
@@ -161,9 +236,19 @@ const Login = () => {
                 </div>
               </Button>
 
+              <p className="text-center text-sm text-slate-500">
+                Do not have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-indigo-500 hover:text-indigo-600 font-medium transition-colors"
+                >
+                  Sign up here
+                </Link>
+              </p>
+
               {/* Trust Indicators */}
-              <div className="text-center space-y-4 sm:space-y-6 pt-2 sm:pt-4">
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              {/* <div className="text-center space-y-2 sm:space-y-2"> */}
+                {/* <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                   <div className="trust-badge-light flex items-center gap-1.5 sm:gap-2">
                     <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
                     <span className="text-xs sm:text-sm font-medium text-emerald-600">Secure</span>
@@ -176,9 +261,9 @@ const Login = () => {
                     <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
                     <span className="text-xs sm:text-sm font-medium text-indigo-600">Private</span>
                   </div>
-                </div>
+                </div> */}
 
-                <div className="pt-2 sm:pt-4 space-y-2">
+                <div className="space-y-1">
                   <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm mx-auto px-2">
                     By continuing, you agree to our{" "}
                     <a href="/terms"  target="_blank" className="text-indigo-500 hover:text-indigo-600 transition-colors">
@@ -190,20 +275,20 @@ const Login = () => {
                     </a>
                   </p>
                 </div>
-              </div>
+              {/* </div> */}
             </CardContent>
           </Card>
 
           {/* Mobile Stats */}
           <div className="lg:hidden text-center space-y-4 py-4">
             <p className="text-sm text-slate-500">
-              Trusted by <span className="font-semibold text-indigo-600">50K+</span> businesses worldwide
+              Trusted by <span className="font-semibold text-indigo-600">500+</span> businesses worldwide
             </p>
             <div className="flex items-center justify-center gap-6 text-slate-600">
-              <div className="text-center">
+              {/* <div className="text-center">
                 <div className="text-lg font-bold text-indigo-600">10M+</div>
                 <div className="text-xs text-slate-400">Data Points</div>
-              </div>
+              </div> */}
               <div className="h-8 w-px bg-indigo-100" />
               <div className="text-center">
                 <div className="text-lg font-bold text-indigo-600">99.9%</div>
@@ -235,15 +320,15 @@ const Login = () => {
           </p>
           <div className="flex items-center justify-center space-x-6 xl:space-x-10">
             <div className="text-center group">
-              <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">50K+</div>
+              <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">500+</div>
               <div className="text-xs xl:text-sm text-white/70 mt-1">Businesses</div>
             </div>
             <div className="h-10 xl:h-12 w-px bg-white/20" />
-            <div className="text-center group">
+            {/* <div className="text-center group">
               <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">10M+</div>
               <div className="text-xs xl:text-sm text-white/70 mt-1">Data Points</div>
-            </div>
-            <div className="h-10 xl:h-12 w-px bg-white/20" />
+            </div> */}
+            {/* <div className="h-10 xl:h-12 w-px bg-white/20" /> */}
             <div className="text-center group">
               <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">99.9%</div>
               <div className="text-xs xl:text-sm text-white/70 mt-1">Accuracy</div>

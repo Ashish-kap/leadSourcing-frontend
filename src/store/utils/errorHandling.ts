@@ -10,18 +10,41 @@ interface ApiError {
   [key: string]: any;
 }
 
-export const handleApiError = (error: FetchBaseQueryError | undefined) => {
-  if (!error) return;
+export interface ApiErrorHandlingResult {
+  displayed: boolean;
+  message?: string;
+}
+
+const TECHNICAL_FIELDS = [
+  "status",
+  "error",
+  "stack",
+  "statusCode",
+  "isOperational",
+];
+
+export const handleApiError = (
+  error: FetchBaseQueryError | undefined
+): ApiErrorHandlingResult => {
+  if (!error) {
+    return { displayed: false };
+  }
 
   if ("status" in error) {
     if (error.status === "FETCH_ERROR") {
       toast.error("Network error. Please check your connection.");
-      return;
+      return {
+        displayed: true,
+        message: "Network error. Please check your connection.",
+      };
     }
 
     if (error.status === "TIMEOUT_ERROR") {
       toast.error("Request timeout. Please try again.");
-      return;
+      return {
+        displayed: true,
+        message: "Request timeout. Please try again.",
+      };
     }
 
     const errorData = error?.data as ApiError;
@@ -56,12 +79,16 @@ export const handleApiError = (error: FetchBaseQueryError | undefined) => {
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
         },
       });
-      return;
+      return { displayed: true, message: errorData?.message };
     }
 
-    handleValidationErrors(errorData);
+    return handleValidationErrors(errorData);
   } else {
     toast.error("An unexpected error occurred.");
+    return {
+      displayed: true,
+      message: "An unexpected error occurred.",
+    };
   }
 };
 
@@ -89,41 +116,45 @@ const handleValidationErrors = (errorData: ApiError) => {
   // First priority: show the message field if it exists
   if (errorData?.message) {
     toast.error(errorData.message);
-    return;
+    return { displayed: true, message: errorData.message };
   }
 
   // Second priority: show detail field if it exists
   if (errorData?.detail) {
     toast.error(errorData.detail);
-    return;
+    return { displayed: true, message: errorData.detail };
   }
 
-  // Filter out technical fields that shouldn't be shown to users
-  const technicalFields = [
-    "status",
-    "error",
-    "stack",
-    "statusCode",
-    "isOperational",
-  ];
-
-  // Handle field-specific validation errors (excluding technical fields)
+  // Handle field-specific validation errors (excluding technical fields).
+  // Only show the first user-facing validation message to avoid duplicate toasts.
   const validationEntries = Object.entries(errorData || {}).filter(
-    ([field, _]) => !technicalFields.includes(field)
+    ([field, _]) => !TECHNICAL_FIELDS.includes(field)
   );
 
-  validationEntries.forEach(([field, messages]) => {
-    if (Array.isArray(messages) && messages.length > 0) {
-      toast.error(`${field}: ${messages[0]}`);
-    } else if (typeof messages === "string") {
-      toast.error(`${field}: ${messages}`);
-    }
-  });
+  const [firstField, firstMessages] = validationEntries[0] ?? [];
+
+  if (firstField && Array.isArray(firstMessages) && firstMessages.length > 0) {
+    const message = `${firstField}: ${firstMessages[0]}`;
+    toast.error(message);
+    return { displayed: true, message };
+  }
+
+  if (firstField && typeof firstMessages === "string") {
+    const message = `${firstField}: ${firstMessages}`;
+    toast.error(message);
+    return { displayed: true, message };
+  }
 
   // Show generic message only if no specific errors were found
   if (validationEntries.length === 0) {
     toast.error("Validation error occurred.");
+    return {
+      displayed: true,
+      message: "Validation error occurred.",
+    };
   }
+
+  return { displayed: false };
 };
 
 // Hook for handling RTK Query errors in components

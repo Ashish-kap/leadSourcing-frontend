@@ -1,6 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 // import LandingPage from "./pages/LandingPage";
-// import Signup from "./pages/Signup";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/login";
 import { withProfileModalOnHome } from "./components/profile/withProfileModalOnHome";
@@ -22,7 +25,10 @@ const RoutesMain = () => (
   <Routes>
     {/* Privacy and terms are handled by Vercel redirects in vercel.json */}
     <Route path="/login" element={<Login />} />
-    {/* <Route path="/signup" element={<Signup />} /> */}
+    <Route path="/signup" element={<Signup />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/verify-email" element={<VerifyEmail />} />
     <Route element={<ProtectedRoute />}>
       <Route path="/" element={<DashboardWithProfileModal />} />
       <Route path="/extraction" element={<Extraction />} />
