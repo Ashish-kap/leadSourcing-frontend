@@ -4,6 +4,8 @@ import {
   LoginRequest,
   SignupRequest,
   LoginResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
 } from "./types/auth";
 
 export const authApi = apiSlice.injectEndpoints({
@@ -62,6 +64,42 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Auth", "User"],
     }),
 
+    forgotPassword: builder.mutation<unknown, ForgotPasswordRequest>({
+      query: (body) => ({
+        url: "/users/forgotPassword",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    resetPassword: builder.mutation<
+      unknown,
+      { token: string } & ResetPasswordRequest
+    >({
+      query: ({ token, password, passwordConfirm }) => ({
+        url: `/users/resetPassword/${encodeURIComponent(token)}`,
+        method: "PATCH",
+        body: { password, passwordConfirm },
+      }),
+    }),
+
+    verifyEmail: builder.mutation<LoginResponse, { token: string }>({
+      query: ({ token }) => ({
+        url: `/users/verifyEmail/${encodeURIComponent(token)}`,
+        method: "GET",
+      }),
+      transformResponse: (response: LoginResponse) => {
+        if (response?.token) {
+          localStorage.setItem("authToken", response.token);
+          if (response.refresh) {
+            localStorage.setItem("refreshToken", response.token);
+          }
+        }
+        return response;
+      },
+      invalidatesTags: ["Auth", "User"],
+    }),
+
     googleAuth: builder.mutation<LoginResponse, { googleToken: string }>({
       query: ({ googleToken }) => ({
         url: "/users/auth/google/token",
@@ -104,6 +142,9 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useSignupMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useVerifyEmailMutation,
   useLogoutMutation,
   useGoogleAuthMutation,
   useRefreshTokenMutation,

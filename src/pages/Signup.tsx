@@ -7,9 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
-  CardDescription,
+  // CardDescription,
   CardHeader,
-  CardTitle,
+  // CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
@@ -19,12 +19,16 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  // Shield,
+  // Zap,
+  // Lock,
 } from "lucide-react";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
   initializeGoogleAuth,
   signInWithGooglePopup,
 } from "@/utils/googleAuth";
+import "../login.css";
 
 const Signup = () => {
   const { signup, googleAuth, isSigningUp, isGoogleLoggingIn } = useAuth();
@@ -90,9 +94,8 @@ const Signup = () => {
         formData.confirmPassword
       );
       toast.success("Account created successfully!");
-    } catch (error) {
-      toast.error("Signup failed - Something went wrong. Please try again.");
-    } finally {
+    } catch {
+      // API error toasts are handled centrally via useAuth -> handleApiError.
     }
   };
 
@@ -106,12 +109,18 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     try {
       const googleToken = await signInWithGooglePopup();
-      await googleAuth(googleToken);
+      try {
+        await googleAuth(googleToken);
+      } catch {
+        // API error toasts are handled centrally via useAuth -> handleApiError.
+        return;
+      }
+
       toast.success(
         "Welcome! Your account has been created successfully with Google."
       );
-    } catch (error: any) {
-      // Google signup error
+    } catch {
+      // Popup/provider failure before the API call.
       toast.error("Google signup failed. Please try again.");
     }
   };
@@ -137,76 +146,57 @@ const Signup = () => {
   const strengthInfo = getPasswordStrengthText(passwordStrength);
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Brand Image */}
-      <div className="hidden lg:flex flex-1 hero-gradient items-center justify-center p-8 text-white">
-        <div className="max-w-md text-center">
-          <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8 backdrop-blur-sm">
-            <MapPin className="h-16 w-16" />
-          </div>
-          <h2 className="text-3xl font-bold mb-4">Start Your Journey Today</h2>
-          <p className="text-xl text-white/90 mb-8">
-            Create your account and join thousands of businesses leveraging
-            Google Maps data for growth.
-          </p>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5" />
-              <span>No setup fees</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5" />
-              <span>Free trial included</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5" />
-              <span>Cancel anytime</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5" />
-              <span>24/7 support</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="login-bg flex flex-col lg:flex-row min-h-screen">
+      <div className="grid-bg" />
+      <div className="hex-pattern" />
+      <div className="dot-grid" />
+      <div className="geo-shape geo-circle-1" />
+      <div className="geo-shape geo-circle-2" />
+      <div className="geo-shape geo-circle-3" />
+      <div className="geo-shape geo-square-1" />
+      <div className="geo-shape geo-square-2" />
+      <div className="geo-triangle" />
+      <div className="accent-line accent-line-1" />
+      <div className="accent-line accent-line-2" />
+      <div className="accent-line accent-line-3" />
 
-      {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-md space-y-8">
-          {/* Logo */}
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-6">
-              <div
-                onClick={() => navigate("/")}
-                className="w-10 h-10 cursor-pointer bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
-              >
-                <MapPin className="h-6 w-6 text-white" />
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 relative z-10">
+        <div className="w-full max-w-md space-y-6 sm:space-y-8">
+          <Card className="login-card-light border-0 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl">
+            <CardHeader className="space-y-3 sm:space-y-4 px-0">
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                  <div
+                    onClick={() => navigate("/")}
+                    className="w-10 h-10 sm:w-12 sm:h-12 cursor-pointer bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25 transition-transform hover:scale-105"
+                  >
+                    <MapPin className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
+                  </div>
+                  <span
+                    onClick={() => navigate("/")}
+                    className="text-2xl sm:text-3xl cursor-pointer font-bold gradient-text-light tracking-tight"
+                  >
+                    CazaLead
+                  </span>
+                </div>
+                <p className="text-slate-500 text-base sm:text-lg leading-relaxed px-2 py-2">
+                  Sign up securely with email or Google.
+                </p>
+                {/* <CardTitle className="text-xl sm:text-xl text-slate-800">
+                  Create your account
+                </CardTitle> */}
+                {/* <CardDescription className="text-slate-500 mt-2 text-sm sm:text-base">
+                  Create your account
+                </CardDescription> */}
               </div>
-              <span
-                onClick={() => navigate("/")}
-                className="text-2xl cursor-pointer font-bold gradient-text"
-              >
-                CazaLead
-              </span>
-            </div>
-            <h1 className="text-3xl font-bold">Create your account</h1>
-            <p className="text-muted-foreground mt-2">
-              Start extracting Google Maps data in minutes
-            </p>
-          </div>
-
-          {/* Form */}
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-center">Sign Up</CardTitle>
-              <CardDescription className="text-center">
-                Enter your information to create your account
-              </CardDescription>
             </CardHeader>
-            <CardContent>
+
+            <CardContent className="px-0">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName" className="text-slate-700">
+                    Full Name
+                  </Label>
                   <Input
                     id="fullName"
                     name="fullName"
@@ -215,12 +205,14 @@ const Signup = () => {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className="h-12"
+                    className="h-12 bg-white/80"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-slate-700">
+                    Email
+                  </Label>
                   <Input
                     id="email"
                     name="email"
@@ -229,12 +221,14 @@ const Signup = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="h-12"
+                    className="h-12 bg-white/80"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-slate-700">
+                    Password
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -244,7 +238,7 @@ const Signup = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
-                      className="h-12 pr-10"
+                      className="h-12 pr-10 bg-white/80"
                     />
                     <button
                       type="button"
@@ -261,12 +255,12 @@ const Signup = () => {
                   {formData.password && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span>Password strength:</span>
+                        <span className="text-slate-500">Password strength:</span>
                         <span className={strengthInfo.color}>
                           {strengthInfo.text}
                         </span>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-2">
+                      <div className="w-full bg-slate-100 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all ${
                             passwordStrength <= 2
@@ -285,7 +279,9 @@ const Signup = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword" className="text-slate-700">
+                    Confirm Password
+                  </Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
@@ -295,7 +291,7 @@ const Signup = () => {
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       required
-                      className="h-12 pr-10"
+                      className="h-12 pr-10 bg-white/80"
                     />
                     <button
                       type="button"
@@ -324,7 +320,7 @@ const Signup = () => {
                         <>
                           <XCircle className="h-4 w-4 text-red-500" />
                           <span className="text-red-500">
-                            Passwords don't match
+                            Passwords do not match
                           </span>
                         </>
                       )}
@@ -342,14 +338,14 @@ const Signup = () => {
                   />
                   <label
                     htmlFor="terms"
-                    className="text-sm text-muted-foreground cursor-pointer"
+                    className="text-sm text-slate-500 cursor-pointer"
                   >
                     I agree to the{" "}
                     <Link
                       to="/terms"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="text-indigo-500 hover:text-indigo-600 transition-colors"
                     >
                       Terms of Service
                     </Link>{" "}
@@ -358,7 +354,7 @@ const Signup = () => {
                       to="/privacy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline"
+                      className="text-indigo-500 hover:text-indigo-600 transition-colors"
                     >
                       Privacy Policy
                     </Link>
@@ -367,7 +363,7 @@ const Signup = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 cursor-pointer"
+                  className="w-full h-12 sm:h-14 cursor-pointer text-sm sm:text-base font-semibold"
                   disabled={
                     isSigningUp ||
                     !agreeToTerms ||
@@ -376,10 +372,10 @@ const Signup = () => {
                   }
                 >
                   {isSigningUp ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
-                    </>
+                    <div className="flex items-center justify-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Creating account...</span>
+                    </div>
                   ) : (
                     "Create Account"
                   )}
@@ -389,19 +385,19 @@ const Signup = () => {
               <div className="mt-6">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border" />
+                    <div className="w-full border-t border-slate-200" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
+                    <span className="login-card-light px-2 text-slate-500">
                       Or continue with
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 gap-3">
+                <div className="mt-5 grid grid-cols-1 gap-3">
                   <Button
                     variant="outline"
-                    className="h-12 cursor-pointer"
+                    className="google-btn-light h-12 cursor-pointer text-slate-700 hover:text-slate-900"
                     onClick={handleGoogleSignup}
                     disabled={isGoogleLoggingIn}
                   >
@@ -427,33 +423,70 @@ const Signup = () => {
                         />
                       </svg>
                     )}
-                    {isGoogleLoggingIn ? "Creating account..." : "Google"}
+                    {isGoogleLoggingIn ? "Creating account..." : "Continue with Google"}
                   </Button>
-                  {/* <Button variant="outline" className="h-12">
-                    <svg
-                      className="mr-2 h-4 w-4"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M23.5 12.5c0-.8-.1-1.6-.2-2.4H12v4.5h6.5c-.3 1.4-1.1 2.6-2.3 3.4v2.8h3.7c2.2-2 3.5-5 3.5-8.3z" />
-                      <path d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.7-2.8c-1.1.7-2.5 1.1-4.2 1.1-3.2 0-5.9-2.2-6.9-5.1H1.4v2.9C3.4 21.8 7.4 24 12 24z" />
-                    </svg>
-                    Microsoft
-                  </Button> */}
                 </div>
               </div>
 
-              <p className="text-center text-sm text-muted-foreground mt-6">
+              <p className="text-center text-sm text-slate-500 mt-6">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-primary hover:underline font-medium"
+                  className="text-indigo-500 hover:text-indigo-600 font-medium transition-colors"
                 >
                   Sign in here
                 </Link>
               </p>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      <div className="hidden lg:flex flex-1 brand-side-light items-center justify-center p-6 xl:p-8 relative">
+        <div className="brand-geo brand-hex-1" />
+        <div className="brand-geo brand-hex-2" />
+        <div className="brand-geo brand-line-1" />
+        <div className="brand-geo brand-line-2" />
+
+        <div className="max-w-sm xl:max-w-md text-center relative z-10">
+          <div className="w-24 h-24 xl:w-32 xl:h-32 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 xl:mb-8 backdrop-blur-sm border border-white/20 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
+            <MapPin className="h-12 w-12 xl:h-16 xl:w-16 text-white" />
+          </div>
+          <h2 className="text-2xl xl:text-3xl text-white font-bold mb-3 xl:mb-4">
+            Launch Your Lead Engine
+          </h2>
+          <p className="text-lg xl:text-xl text-white/85 mb-8 xl:mb-10">
+            Create your account to unlock high-quality business leads and start
+            scaling outreach faster.
+          </p>
+          <div className="flex items-center justify-center space-x-6 xl:space-x-10">
+            <div className="text-center group">
+              <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">
+                500+
+              </div>
+              <div className="text-xs xl:text-sm text-white/70 mt-1">
+                Businesses
+              </div>
+            </div>
+            <div className="h-10 xl:h-12 w-px bg-white/20" />
+            {/* <div className="text-center group">
+              <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">
+                10M+
+              </div>
+              <div className="text-xs xl:text-sm text-white/70 mt-1">
+                Data Points
+              </div>
+            </div> */}
+            {/* <div className="h-10 xl:h-12 w-px bg-white/20" /> */}
+            <div className="text-center group">
+              <div className="text-2xl xl:text-3xl font-bold text-white group-hover:scale-110 transition-transform">
+                99.9%
+              </div>
+              <div className="text-xs xl:text-sm text-white/70 mt-1">
+                Accuracy
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

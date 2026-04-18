@@ -79,6 +79,15 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  emailID: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  passwordConfirm: string;
+}
+
 export interface SignupRequest {
   name: string;
   emailID: string;

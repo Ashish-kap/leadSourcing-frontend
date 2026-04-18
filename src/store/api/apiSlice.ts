@@ -9,6 +9,23 @@ import { Mutex } from "async-mutex";
 import { getCookie } from "@/utils/cookies";
 
 const mutex = new Mutex();
+const REAUTH_EXCLUDED_PATHS = [
+  "/users/login",
+  "/users/signup",
+  "/users/verifyEmail",
+  "/users/auth/google/token",
+  "/users/forgotPassword",
+  "/users/resetPassword",
+  "/users/verify-token",
+];
+
+const getRequestUrl = (args: string | FetchArgs) =>
+  typeof args === "string" ? args : args.url;
+
+const shouldSkipReauth = (args: string | FetchArgs) => {
+  const requestUrl = getRequestUrl(args);
+  return REAUTH_EXCLUDED_PATHS.some((path) => requestUrl.startsWith(path));
+};
 
 // Base URL configuration
 const baseQuery = fetchBaseQuery({
@@ -41,7 +58,7 @@ const baseQueryWithReauth: BaseQueryFn<
   await mutex.waitForUnlock();
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 403) {
+  if (result.error && result.error.status === 403 && !shouldSkipReauth(args)) {
     // Checking whether the mutex is locked
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();

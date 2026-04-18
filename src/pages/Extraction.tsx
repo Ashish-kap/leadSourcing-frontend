@@ -35,6 +35,7 @@ import { trackEvent } from "@/service/analytics";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { InfoAlertDialog } from "@/components/ui/info-alert-dialog";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface LocationState {
   countryCode: string;
@@ -108,6 +109,35 @@ export const Extraction: React.FC = () => {
     if (!location.countryCode || !location.stateCode) return [];
     return City.getCitiesOfState(location.countryCode, location.stateCode);
   }, [location.countryCode, location.stateCode]);
+
+  const countryOptions = useMemo(
+    () =>
+      countries.map((country) => ({
+        value: country.isoCode,
+        label: country.name,
+      })),
+    [countries]
+  );
+
+  const stateOptions = useMemo(
+    () =>
+      states.map((state) => ({
+        value: state.isoCode,
+        label: state.name,
+      })),
+    [states]
+  );
+
+  const cityOptions = useMemo(
+    () =>
+      cities.map((city) => ({
+        key: `${city.name}-${city.latitude}-${city.longitude}`,
+        value: city.name,
+        label: city.name,
+        keywords: [city.stateCode, city.countryCode].filter(Boolean),
+      })),
+    [cities]
+  );
 
   const handleCountryChange = (countryCode: string) => {
     setLocation({
@@ -404,28 +434,8 @@ export const Extraction: React.FC = () => {
       toast.success(`Scraping started! Job ID: ${result.jobId}`);
       // Set flag to show live data dialog on Dashboard
       localStorage.setItem("showLiveDataDialog", "true");
-    } catch (error: any) {
-      // Handle backend validation errors
-      const errorMessage =
-        error?.data?.error || error?.message || "Failed to start scraping";
-
-      // Check for specific validation errors
-      if (errorMessage.includes("reviewTimeRange")) {
-        toast.error(
-          "Invalid review time range. Please enter a value between 0 and 10 years."
-        );
-      } else if (errorMessage.includes("ratingFilter")) {
-        toast.error(
-          "Invalid rating filter. Please enter a value between 1 and 5."
-        );
-      } else if (errorMessage.includes("maxRecords")) {
-        toast.error(
-          "Invalid number of records. Please check your plan limits."
-        );
-      } else {
-        // Show the original error message from backend
-        toast.error(errorMessage);
-      }
+    } catch {
+      // API error toasts are handled centrally via useScrapeJob -> handleApiError.
     }
   };
 
@@ -533,24 +543,14 @@ export const Extraction: React.FC = () => {
                             </TooltipContent>
                           </Tooltip>
                         </div>
-                        <Select
+                        <SearchableSelect
+                          id="country"
+                          options={countryOptions}
                           value={location.countryCode}
                           onValueChange={handleCountryChange}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {countries.map((country) => (
-                              <SelectItem
-                                key={country.isoCode}
-                                value={country.isoCode}
-                              >
-                                {country.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          placeholder="Select country"
+                          searchPlaceholder="Search countries..."
+                        />
                       </div>
 
                       <div className="space-y-2 ">
@@ -568,45 +568,28 @@ export const Extraction: React.FC = () => {
                             </TooltipContent>
                           </Tooltip>
                         </div>
-                        <Select
+                        <SearchableSelect
+                          id="state"
+                          options={stateOptions}
                           value={location.stateCode}
                           onValueChange={handleStateChange}
+                          placeholder="Select state"
+                          searchPlaceholder="Search states..."
                           disabled={!location.countryCode}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select state" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {states.map((state) => (
-                              <SelectItem
-                                key={state.isoCode}
-                                value={state.isoCode}
-                              >
-                                {state.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        />
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="city">City</Label>
-                        <Select
+                        <SearchableSelect
+                          id="city"
+                          options={cityOptions}
                           value={location.city}
                           onValueChange={handleCityChange}
+                          placeholder="Select city"
+                          searchPlaceholder="Search cities..."
                           disabled={!location.stateCode}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select city" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {cities.map((city) => (
-                              <SelectItem key={city.name} value={city.name}>
-                                {city.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        />
                       </div>
                     </div>
 
