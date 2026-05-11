@@ -19,13 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -41,24 +34,11 @@ const profileSchema = z.object({
     .refine((val) => !val || val === "" || z.string().url().safeParse(val).success, {
       message: "Please enter a valid URL",
     }),
-  howDidYouHearAbout: z.string().min(1, "Please select how you heard about us"),
+  howDidYouHearAbout: z.string().min(1, "Please tell us how you heard about us"),
   userInfo: z.boolean().optional(),
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
-
-const HOW_DID_YOU_HEAR_OPTIONS = [
-  { value: "Reddit Ads", label: "Reddit Ads" },
-  { value: "Reddit Post", label: "Reddit Post" },
-  { value: "LinkedIn", label: "LinkedIn" },
-  { value: "Twitter/x", label: "Twitter/x" },
-  { value: "Someone Shared a Link", label: "Someone Shared a Link" },
-  { value: "Other", label: "Other" },
-  // { value: "Facebook", label: "Facebook" },
-  // { value: "Instagram", label: "Instagram" },
-  // { value: "TikTok", label: "TikTok" },
-  // { value: "YouTube", label: "YouTube" },
-];
 
 interface ProfileModalProps {
   open: boolean;
@@ -184,24 +164,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     How did you hear about us?{" "}
                     <span className="text-destructive">*</span>
                   </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value ?? ""}
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {HOW_DID_YOU_HEAR_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. LinkedIn, a friend, Google search..."
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
