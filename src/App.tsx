@@ -12,6 +12,7 @@ import {
   // setUserProps,
 } from "@/service/analytics";
 import { Analytics } from "@vercel/analytics/react";
+import { MaintenanceTopBanner } from "@/components/ui/maintenance-top-banner";
 
 const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
 
@@ -43,6 +44,7 @@ function App() {
         <Analytics />
         <GAListener />
         <Toaster />
+        <MaintenanceTopBanner />
         <RoutesMain />
       </Router>
     </Provider>
