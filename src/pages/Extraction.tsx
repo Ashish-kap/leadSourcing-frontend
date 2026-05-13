@@ -36,6 +36,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { InfoAlertDialog } from "@/components/ui/info-alert-dialog";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useMaintenanceStatus } from "@/utils/maintenance";
 
 interface LocationState {
   countryCode: string;
@@ -48,6 +49,7 @@ export const Extraction: React.FC = () => {
   const [showExtractionGuideDialog, setShowExtractionGuideDialog] =
     useState(false);
   const { data: userData } = useGetCurrentUserQuery();
+  const maintenance = useMaintenanceStatus();
   const {
     startScraping,
     isScraping,
@@ -274,6 +276,13 @@ export const Extraction: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (maintenance.isActive) {
+      toast.error(
+        `Maintenance is in progress until approximately ${maintenance.localEndLabel}. New extractions are temporarily paused.`
+      );
+      return;
+    }
 
     // Validation
     if (!formData.keyword.trim()) {
@@ -939,7 +948,7 @@ export const Extraction: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Button
                         type="submit"
-                        disabled={isScraping}
+                        disabled={isScraping || maintenance.isActive}
                         className="flex-1 cursor-pointer"
                       >
                         {isScraping ? (
@@ -947,6 +956,8 @@ export const Extraction: React.FC = () => {
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Scraping...
                           </>
+                        ) : maintenance.isActive ? (
+                          "Maintenance in progress"
                         ) : (
                           "Start Scraping"
                         )}

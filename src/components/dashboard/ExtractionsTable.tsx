@@ -62,6 +62,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { Country, State } from "country-state-city";
+import { useMaintenanceStatus } from "@/utils/maintenance";
 
 interface Extraction {
   id: string;
@@ -175,6 +176,7 @@ export const ExtractionsTable: React.FC = () => {
     Record<string, number>
   >({});
   const navigate = useNavigate();
+  const maintenance = useMaintenanceStatus();
 
   const sort = "-createdAt"; // Default sort
 
@@ -648,6 +650,12 @@ export const ExtractionsTable: React.FC = () => {
             {/* RIGHT: Button */}
             <Button
               onClick={() => navigate("/extraction")}
+              disabled={maintenance.isActive}
+              title={
+                maintenance.isActive
+                  ? "New extractions are temporarily paused during maintenance."
+                  : undefined
+              }
               className="whitespace-nowrap cursor-pointer bg-primary/90 text-primary-foreground shadow-glow"
             >
               <Plus className="mr-2 h-4 w-4" />
