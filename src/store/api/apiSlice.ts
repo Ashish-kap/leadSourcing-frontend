@@ -7,6 +7,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
 import { getCookie } from "@/utils/cookies";
+import { getVisitorId } from "@/service/fingerprint";
 
 const mutex = new Mutex();
 const REAUTH_EXCLUDED_PATHS = [
@@ -31,7 +32,7 @@ const shouldSkipReauth = (args: string | FetchArgs) => {
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
   credentials: "include", // Include cookies in cross-origin requests
-  prepareHeaders: (headers, {}) => {
+  prepareHeaders: async (headers) => {
     const token = localStorage.getItem("authToken");
 
     if (token) {
@@ -42,6 +43,12 @@ const baseQuery = fetchBaseQuery({
     const refCode = getCookie("ref");
     if (refCode) {
       headers.set("X-Referral-Code", refCode);
+    }
+
+    // Device fingerprint for abuse prevention on signup endpoints.
+    const fingerprint = await getVisitorId();
+    if (fingerprint) {
+      headers.set("X-Fingerprint", fingerprint);
     }
 
     return headers;
