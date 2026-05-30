@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import {
   useReactTable,
@@ -192,6 +192,8 @@ export const ExtractionsTable: React.FC = () => {
   });
 
   const { refetch: refetchUser } = useGetCurrentUserQuery();
+  const refetchJobsRef = useRef(refetchJobs);
+  const refetchUserRef = useRef(refetchUser);
 
   const [deleteJob, { isLoading: isDeletingJob }] = useDeleteJobMutation();
 
@@ -204,6 +206,11 @@ export const ExtractionsTable: React.FC = () => {
     hasNextPage: false,
     hasPrevPage: false,
   };
+
+  useEffect(() => {
+    refetchJobsRef.current = refetchJobs;
+    refetchUserRef.current = refetchUser;
+  }, [refetchJobs, refetchUser]);
 
   // FIXED: Proper Socket.IO connection management
   useEffect(() => {
@@ -243,9 +250,9 @@ export const ExtractionsTable: React.FC = () => {
           return updated;
         });
         // Refetch jobs data to update the table
-        refetchJobs();
+        refetchJobsRef.current();
         // Refetch user data to update credits/usage
-        refetchUser();
+        refetchUserRef.current();
       } else if (data.type === "job_no_data_found") {
         // Clean up real-time progress for completed job
         setRealtimeProgress((prev) => {
@@ -254,9 +261,9 @@ export const ExtractionsTable: React.FC = () => {
           return updated;
         });
         // Refetch jobs data to update the table
-        refetchJobs();
+        refetchJobsRef.current();
         // Refetch user data to update credits/usage
-        refetchUser();
+        refetchUserRef.current();
       } else if (data.type === "job_failed") {
         // Clean up real-time progress for failed job
         setRealtimeProgress((prev) => {
@@ -264,15 +271,15 @@ export const ExtractionsTable: React.FC = () => {
           delete updated[data.job.jobId];
           return updated;
         });
-        refetchJobs();
+        refetchJobsRef.current();
         // Refetch user data to update credits/usage
-        refetchUser();
+        refetchUserRef.current();
       } else if (data.type === "job_started") {
-        refetchJobs();
+        refetchJobsRef.current();
       } else if (data.type === "job_deleted") {
-        refetchJobs();
+        refetchJobsRef.current();
         // Refetch user data to update credits/usage
-        refetchUser();
+        refetchUserRef.current();
       }
     });
 
@@ -294,7 +301,7 @@ export const ExtractionsTable: React.FC = () => {
       newSocket.disconnect();
       setIsConnected(false);
     };
-  }, [refetchJobs, refetchUser]);
+  }, []);
 
   // handle mobile layout
   useEffect(() => {
