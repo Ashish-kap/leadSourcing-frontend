@@ -208,9 +208,14 @@ export const ExtractionsTable: React.FC = () => {
   // FIXED: Proper Socket.IO connection management
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+    console.log("[socket] effect init", {
+      hasToken: Boolean(token),
+      backendHost: import.meta.env.VITE_BACKEND_HOST,
+    });
 
     if (!token) {
       // No token found for Socket.IO connection
+      console.log("[socket] missing auth token, skipping socket connection");
       return;
     }
 
@@ -218,24 +223,32 @@ export const ExtractionsTable: React.FC = () => {
       auth: { token },
       autoConnect: true,
     });
+    console.log("[socket] socket created", {
+      backendHost: import.meta.env.VITE_BACKEND_HOST,
+    });
 
     // Connection event handlers
     newSocket.on("connect", () => {
+      console.log("[socket] connect", { socketId: newSocket.id });
       setIsConnected(true);
     });
 
-    newSocket.on("connect_error", () => {
+    newSocket.on("connect_error", (error) => {
       // Socket.IO connection error
+      console.log("[socket] connect_error", error);
       setIsConnected(false);
     });
 
-    newSocket.on("disconnect", () => {
+    newSocket.on("disconnect", (reason) => {
+      console.log("[socket] disconnect", { reason });
       setIsConnected(false);
     });
 
     // Job event handlers
     newSocket.on("job_update", (data) => {
+      console.log("[socket] job_update", data);
       if (data.type === "job_completed") {
+        console.log("[socket] job_update branch: job_completed", data);
         // Clean up real-time progress for completed job
         setRealtimeProgress((prev) => {
           const updated = { ...prev };
@@ -247,6 +260,7 @@ export const ExtractionsTable: React.FC = () => {
         // Refetch user data to update credits/usage
         refetchUser();
       } else if (data.type === "job_no_data_found") {
+        console.log("[socket] job_update branch: job_no_data_found", data);
         // Clean up real-time progress for completed job
         setRealtimeProgress((prev) => {
           const updated = { ...prev };
@@ -258,6 +272,7 @@ export const ExtractionsTable: React.FC = () => {
         // Refetch user data to update credits/usage
         refetchUser();
       } else if (data.type === "job_failed") {
+        console.log("[socket] job_update branch: job_failed", data);
         // Clean up real-time progress for failed job
         setRealtimeProgress((prev) => {
           const updated = { ...prev };
@@ -268,8 +283,10 @@ export const ExtractionsTable: React.FC = () => {
         // Refetch user data to update credits/usage
         refetchUser();
       } else if (data.type === "job_started") {
+        console.log("[socket] job_update branch: job_started", data);
         refetchJobs();
-      }else if (data.type === "job_deleted") {
+      } else if (data.type === "job_deleted") {
+        console.log("[socket] job_update branch: job_deleted", data);
         refetchJobs();
         // Refetch user data to update credits/usage
         refetchUser();
@@ -277,6 +294,7 @@ export const ExtractionsTable: React.FC = () => {
     });
 
     newSocket.on("job_progress", (data) => {
+      console.log("[socket] job_progress", data);
       // Update real-time progress state
       setRealtimeProgress((prev) => ({
         ...prev,
@@ -284,12 +302,14 @@ export const ExtractionsTable: React.FC = () => {
       }));
     });
 
-    newSocket.on("active_jobs_status", () => {
+    newSocket.on("active_jobs_status", (data) => {
+      console.log("[socket] active_jobs_status", data);
       // Handle active jobs status if needed
     });
 
     // IMPORTANT: Cleanup function
     return () => {
+      console.log("[socket] cleanup", { socketId: newSocket.id });
       newSocket.removeAllListeners();
       newSocket.disconnect();
       setIsConnected(false);
