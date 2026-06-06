@@ -24,18 +24,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Loader2, RotateCcw, HelpCircle } from "lucide-react";
+import { Loader2, Lock, RotateCcw } from "lucide-react";
 import { trackEvent } from "@/service/analytics";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { InfoAlertDialog } from "@/components/ui/info-alert-dialog";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 import { useMaintenanceStatus } from "@/utils/maintenance";
 
 interface LocationState {
@@ -44,11 +39,15 @@ interface LocationState {
   city: string;
 }
 
+const ADVANCED_FILTERS_DISABLED_MESSAGE = "Available on paid plans.";
+
 export const Extraction: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showExtractionGuideDialog, setShowExtractionGuideDialog] =
     useState(false);
   const { data: userData } = useGetCurrentUserQuery();
+  const isFreePlan = userData?.user.plan === "free";
+  const canUseAdvancedFilters = !isFreePlan;
   const maintenance = useMaintenanceStatus();
   const {
     startScraping,
@@ -89,6 +88,33 @@ export const Extraction: React.FC = () => {
     onlyWithoutWebsite: false,
   });
 
+  useEffect(() => {
+    if (!isFreePlan) return;
+
+    setFormData((prev) => {
+      if (
+        prev.reviewTimeRange === null &&
+        prev.ratingFilter.value === null &&
+        prev.reviewFilter.value === null
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        reviewTimeRange: null,
+        ratingFilter: {
+          ...prev.ratingFilter,
+          value: null,
+        },
+        reviewFilter: {
+          ...prev.reviewFilter,
+          value: null,
+        },
+      };
+    });
+  }, [isFreePlan]);
+
   const [location, setLocation] = useState<LocationState>({
     countryCode: "",
     stateCode: "",
@@ -118,7 +144,7 @@ export const Extraction: React.FC = () => {
         value: country.isoCode,
         label: country.name,
       })),
-    [countries]
+    [countries],
   );
 
   const stateOptions = useMemo(
@@ -127,7 +153,7 @@ export const Extraction: React.FC = () => {
         value: state.isoCode,
         label: state.name,
       })),
-    [states]
+    [states],
   );
 
   const cityOptions = useMemo(
@@ -138,7 +164,7 @@ export const Extraction: React.FC = () => {
         label: city.name,
         keywords: [city.stateCode, city.countryCode].filter(Boolean),
       })),
-    [cities]
+    [cities],
   );
 
   const handleCountryChange = (countryCode: string) => {
@@ -164,6 +190,26 @@ export const Extraction: React.FC = () => {
     }));
   };
 
+  const getAdvancedFilterHelpContent = (content: React.ReactNode) => (
+    <>
+      {content}
+      {isFreePlan && (
+        <span className="mt-2 block text-yellow-600">
+          {ADVANCED_FILTERS_DISABLED_MESSAGE}
+        </span>
+      )}
+    </>
+  );
+  const advancedFilterLabelClassName = isFreePlan
+    ? "text-muted-foreground"
+    : undefined;
+  const renderAdvancedFilterLabel = (htmlFor: string, label: string) => (
+    <Label htmlFor={htmlFor} className={advancedFilterLabelClassName}>
+      {label}
+    </Label>
+  );
+  const advancedFilterHelpIcon = isFreePlan ? Lock : undefined;
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
 
@@ -176,8 +222,8 @@ export const Extraction: React.FC = () => {
             value === "" || value === null || value === undefined
               ? null
               : isNaN(parseFloat(value))
-              ? null
-              : parseFloat(value),
+                ? null
+                : parseFloat(value),
         },
       }));
       return;
@@ -192,8 +238,8 @@ export const Extraction: React.FC = () => {
             value === "" || value === null || value === undefined
               ? null
               : isNaN(parseFloat(value))
-              ? null
-              : parseFloat(value),
+                ? null
+                : parseFloat(value),
         },
       }));
       return;
@@ -206,8 +252,8 @@ export const Extraction: React.FC = () => {
           ? value === "" || value === null || value === undefined
             ? null
             : isNaN(parseFloat(value))
-            ? null
-            : parseFloat(value)
+              ? null
+              : parseFloat(value)
           : value,
     }));
   };
@@ -234,14 +280,18 @@ export const Extraction: React.FC = () => {
     }));
   };
 
-  const handleExtractNegativeReviewsCheckboxChange = (checked: boolean | string) => {
+  const handleExtractNegativeReviewsCheckboxChange = (
+    checked: boolean | string,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       extractNegativeReviews: checked === true,
     }));
   };
 
-  const handleOnlyWithoutWebsiteCheckboxChange = (checked: boolean | string) => {
+  const handleOnlyWithoutWebsiteCheckboxChange = (
+    checked: boolean | string,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       onlyWithoutWebsite: checked === true,
@@ -251,7 +301,7 @@ export const Extraction: React.FC = () => {
   };
 
   const handleRatingOperatorChange = (
-    operator: "gt" | "lt" | "gte" | "lte"
+    operator: "gt" | "lt" | "gte" | "lte",
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -263,7 +313,7 @@ export const Extraction: React.FC = () => {
   };
 
   const handleReviewOperatorChange = (
-    operator: "gt" | "lt" | "gte" | "lte"
+    operator: "gt" | "lt" | "gte" | "lte",
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -279,7 +329,7 @@ export const Extraction: React.FC = () => {
 
     if (maintenance.isActive) {
       toast.error(
-        `Maintenance is in progress until approximately ${maintenance.localEndLabel}. New extractions are temporarily paused.`
+        `Maintenance is in progress until approximately ${maintenance.localEndLabel}. New extractions are temporarily paused.`,
       );
       return;
     }
@@ -301,26 +351,28 @@ export const Extraction: React.FC = () => {
     }
 
     // Check plan limits for free users (fallback check)  -- tempory disable for 24hrs offer
-    if (userData?.user.plan === "free" && formData.maxRecords > 50) {
+    if (isFreePlan && formData.maxRecords > 100) {
       toast.error(
-        "Free plans are limited to 50 records. Please upgrade to Business plan for more extractions."
+        "Free plans are limited to 100 records. Please upgrade to Business plan for more extractions.",
       );
       return;
     }
 
     // Check if user has enough credits
     const remainingCredits = userData?.user.credits?.remaining;
-    if (remainingCredits !== undefined && remainingCredits < formData.maxRecords) {
+    if (
+      remainingCredits !== undefined &&
+      remainingCredits < formData.maxRecords
+    ) {
       toast.error(
-        `Insufficient credits. You have ${remainingCredits} credits remaining, but need ${formData.maxRecords} credits for this extraction. Please upgrade your plan or reduce the number of records.`
+        `Insufficient credits. You have ${remainingCredits} credits remaining, but need ${formData.maxRecords} credits for this extraction. Please upgrade your plan or reduce the number of records.`,
       );
       return;
     }
 
-    
-
     // Validate reviewTimeRange if provided
     if (
+      canUseAdvancedFilters &&
       formData.reviewTimeRange !== null &&
       (formData.reviewTimeRange < 0 || formData.reviewTimeRange > 10)
     ) {
@@ -338,27 +390,33 @@ export const Extraction: React.FC = () => {
     //   return;
     // }
 
+    const reviewTimeRange = canUseAdvancedFilters
+      ? formData.reviewTimeRange
+      : null;
+    const ratingFilter =
+      canUseAdvancedFilters && formData.ratingFilter.value !== null
+        ? {
+            operator: formData.ratingFilter.operator,
+            value: formData.ratingFilter.value,
+          }
+        : undefined;
+    const reviewFilter =
+      canUseAdvancedFilters && formData.reviewFilter.value !== null
+        ? {
+            operator: formData.reviewFilter.operator,
+            value: formData.reviewFilter.value,
+          }
+        : undefined;
+
     const fullRequest: scrapeJobPostRequest = {
       keyword: formData.keyword.trim(),
       countryCode: location.countryCode,
       stateCode: location.stateCode,
       city: location.city,
       maxRecords: formData.maxRecords,
-      reviewTimeRange: formData.reviewTimeRange,
-      ratingFilter:
-        formData.ratingFilter.value !== null
-          ? {
-              operator: formData.ratingFilter.operator,
-              value: formData.ratingFilter.value,
-            }
-          : undefined,
-      reviewFilter:
-        formData.reviewFilter.value !== null
-          ? {
-              operator: formData.reviewFilter.operator,
-              value: formData.reviewFilter.value,
-            }
-          : undefined,
+      reviewTimeRange,
+      ratingFilter,
+      reviewFilter,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
       isExtractEmail: formData.isExtractEmail,
       isValidate: formData.isValidate,
@@ -416,12 +474,18 @@ export const Extraction: React.FC = () => {
         }
 
         // Boolean fields
-        if (key === "isExtractEmail" || key === "isValidate" || key === "avoidDuplicate" || key === "extractNegativeReviews" || key === "onlyWithoutWebsite") {
+        if (
+          key === "isExtractEmail" ||
+          key === "isValidate" ||
+          key === "avoidDuplicate" ||
+          key === "extractNegativeReviews" ||
+          key === "onlyWithoutWebsite"
+        ) {
           return typeof value === "boolean";
         }
 
         return false;
-      })
+      }),
     ) as scrapeJobPostRequest;
 
     try {
@@ -477,7 +541,7 @@ export const Extraction: React.FC = () => {
   };
 
   return (
-    <TooltipProvider>
+    <>
       <div className="flex h-screen bg-background overflow-hidden">
         <Sidebar
           isCollapsed={sidebarCollapsed}
@@ -512,18 +576,16 @@ export const Extraction: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <Label htmlFor="keyword">Search Keyword *</Label>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
+                        <HelpTooltip
+                          label="Search Keyword"
+                          content={
+                            <>
                               Enter the type of business or service you want to
-                              find (e.g., 'restaurants', 'hotels', 'coffee
-                              shops')
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
+                              find (e.g., "restaurants", "hotels", "coffee
+                              shops")
+                            </>
+                          }
+                        />
                       </div>
                       <Input
                         id="keyword"
@@ -540,17 +602,15 @@ export const Extraction: React.FC = () => {
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="country">Country *</Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          <HelpTooltip
+                            label="Country"
+                            content={
+                              <>
                                 Select the country where you want to search for
                                 businesses
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>
+                            }
+                          />
                         </div>
                         <SearchableSelect
                           id="country"
@@ -565,17 +625,15 @@ export const Extraction: React.FC = () => {
                       <div className="space-y-2 ">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="state">State/Province</Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          <HelpTooltip
+                            label="State or Province"
+                            content={
+                              <>
                                 Optional: Select a specific state or province to
                                 narrow down your search
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>
+                            }
+                          />
                         </div>
                         <SearchableSelect
                           id="state"
@@ -609,17 +667,15 @@ export const Extraction: React.FC = () => {
                           <Label htmlFor="maxRecords">
                             Number of businesses *
                           </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          <HelpTooltip
+                            label="Number of businesses"
+                            content={
+                              <>
                                 Maximum number of business records to extract
                                 (1-1000). Higher numbers take longer to process.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>
+                            }
+                          />
                         </div>
                         <Input
                           id="maxRecords"
@@ -634,23 +690,23 @@ export const Extraction: React.FC = () => {
                         />
                       </div>
 
-                       <div className="space-y-2">
+                      <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="reviewTimeRange">
-                            Reviews Within Last (years)
-                          </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          {renderAdvancedFilterLabel(
+                            "reviewTimeRange",
+                            "Reviews Within Last (years)",
+                          )}
+                          <HelpTooltip
+                            icon={advancedFilterHelpIcon}
+                            label="Reviews Within Last"
+                            content={getAdvancedFilterHelpContent(
+                              <>
                                 Optional: Only include businesses with reviews
                                 posted within the last X years (0-10). Leave
                                 empty for all reviews.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>,
+                            )}
+                          />
                         </div>
                         <Input
                           id="reviewTimeRange"
@@ -661,31 +717,35 @@ export const Extraction: React.FC = () => {
                           min="0"
                           max="10"
                           placeholder="eg. 5"
+                          disabled={isFreePlan}
                         />
-                      </div> 
+                      </div>
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="ratingOperator">Rating Filter</Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          {renderAdvancedFilterLabel(
+                            "ratingOperator",
+                            "Rating Filter",
+                          )}
+                          <HelpTooltip
+                            icon={advancedFilterHelpIcon}
+                            label="Rating Filter"
+                            content={getAdvancedFilterHelpContent(
+                              <>
                                 Optional: Filter businesses by their average
                                 rating (1-5 stars). Choose operator and value
-                                (e.g., '≥ 4.0' for 4+ stars).
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                                (e.g., "≥ 4.0" for 4+ stars).
+                              </>,
+                            )}
+                          />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <Select
                             value={formData.ratingFilter.operator}
                             onValueChange={handleRatingOperatorChange}
+                            disabled={isFreePlan}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger disabled={isFreePlan}>
                               <SelectValue placeholder="Operator" />
                             </SelectTrigger>
                             <SelectContent>
@@ -713,34 +773,36 @@ export const Extraction: React.FC = () => {
                             max="5"
                             step="0.1"
                             placeholder="eg. 4.5"
+                            disabled={isFreePlan}
                           />
                         </div>
                       </div>
 
-                       <div className="space-y-2">
+                      <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="reviewOperator">
-                            Review Count Filter
-                          </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          {renderAdvancedFilterLabel(
+                            "reviewOperator",
+                            "Review Count Filter",
+                          )}
+                          <HelpTooltip
+                            icon={advancedFilterHelpIcon}
+                            label="Review Count Filter"
+                            content={getAdvancedFilterHelpContent(
+                              <>
                                 Optional: Filter businesses by their total
                                 number of reviews. Choose operator and value
-                                (e.g., '≥ 50' for businesses with 50+ reviews).
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                                (e.g., "≥ 50" for businesses with 50+ reviews).
+                              </>,
+                            )}
+                          />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <Select
                             value={formData.reviewFilter.operator}
                             onValueChange={handleReviewOperatorChange}
+                            disabled={isFreePlan}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger disabled={isFreePlan}>
                               <SelectValue placeholder="Operator" />
                             </SelectTrigger>
                             <SelectContent>
@@ -767,9 +829,10 @@ export const Extraction: React.FC = () => {
                             min="0"
                             step="1"
                             placeholder="eg. 100"
+                            disabled={isFreePlan}
                           />
                         </div>
-                      </div> 
+                      </div>
                     </div>
 
                     {/* Email Extraction & Validation Options */}
@@ -792,24 +855,23 @@ export const Extraction: React.FC = () => {
                           >
                             Scrape Email
                           </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          <HelpTooltip
+                            label="Scrape Email"
+                            content={
+                              <>
                                 Enable this option to attempt extracting email
                                 addresses from business listings when available.
                                 This may increase scraping time but provides
                                 additional contact information.
                                 {formData.onlyWithoutWebsite && (
-                                  <span className="block mt-2 text-yellow-600">
-                                    ⚠️ Disabled when "Only Without Website" is enabled
+                                  <span className="mt-2 block text-yellow-600">
+                                    Disabled when "Only Without Website" is
+                                    enabled
                                   </span>
                                 )}
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>
+                            }
+                          />
                         </div>
                       </div>
 
@@ -818,41 +880,103 @@ export const Extraction: React.FC = () => {
                           id="isValidate"
                           checked={formData.isValidate}
                           onCheckedChange={handleValidateCheckboxChange}
-                          disabled={!formData.isExtractEmail || formData.onlyWithoutWebsite}
+                          disabled={
+                            !formData.isExtractEmail ||
+                            formData.onlyWithoutWebsite
+                          }
                         />
                         <div className="flex items-center space-x-2">
                           <Label
                             htmlFor="isValidate"
                             className={`cursor-pointer ${
-                              !formData.isExtractEmail || formData.onlyWithoutWebsite
+                              !formData.isExtractEmail ||
+                              formData.onlyWithoutWebsite
                                 ? "text-muted-foreground"
                                 : ""
                             }`}
                           >
                             Validate Emails
                           </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
+                          <HelpTooltip
+                            label="Validate Emails"
+                            content={
+                              <>
                                 Enable this option to validate and verify the
                                 extracted email addresses. This may increase
                                 processing time but ensures higher data quality.
                                 {!formData.isExtractEmail && (
-                                  <span className="block mt-2 text-yellow-600">
-                                    ⚠️ Requires "Scrape Email" to be enabled
+                                  <span className="mt-2 block text-yellow-600">
+                                    Requires "Scrape Email" to be enabled
                                   </span>
                                 )}
                                 {formData.onlyWithoutWebsite && (
-                                  <span className="block mt-2 text-yellow-600">
-                                    ⚠️ Disabled when "Only Without Website" is enabled
+                                  <span className="mt-2 block text-yellow-600">
+                                    Disabled when "Only Without Website" is
+                                    enabled
                                   </span>
                                 )}
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                              </>
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 flex-shrink-0">
+                        <Checkbox
+                          id="extractNegativeReviews"
+                          checked={formData.extractNegativeReviews}
+                          onCheckedChange={
+                            handleExtractNegativeReviewsCheckboxChange
+                          }
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="extractNegativeReviews"
+                            className="cursor-pointer"
+                          >
+                            Extract Negative Reviews
+                          </Label>
+                          <HelpTooltip
+                            label="Extract Negative Reviews"
+                            content={
+                              <>
+                                Enable this option to extract negative reviews
+                                (low ratings) from businesses. This can help
+                                identify businesses with poor customer
+                                satisfaction or service quality issues.
+                              </>
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 flex-shrink-0">
+                        <Checkbox
+                          id="onlyWithoutWebsite"
+                          checked={formData.onlyWithoutWebsite}
+                          onCheckedChange={
+                            handleOnlyWithoutWebsiteCheckboxChange
+                          }
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Label
+                            htmlFor="onlyWithoutWebsite"
+                            className="cursor-pointer"
+                          >
+                            Only Without Website
+                          </Label>
+                          <HelpTooltip
+                            label="Only Without Website"
+                            content={
+                              <>
+                                Enable this option to filter and extract only
+                                businesses that do not have a website listed.
+                                This helps you find businesses that may need web
+                                presence services or have limited online
+                                visibility.
+                              </>
+                            }
+                          />
                         </div>
                       </div>
 
@@ -869,79 +993,20 @@ export const Extraction: React.FC = () => {
                           >
                             Avoid duplicates from previous searches
                           </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Enable this option to exclude businesses that have
-                                already been extracted in previous searches. This helps
-                                prevent duplicate entries in your database and ensures
-                                unique data collection.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
+                          <HelpTooltip
+                            label="Avoid duplicates from previous searches"
+                            content={
+                              <>
+                                Enable this option to exclude businesses that
+                                have already been extracted in previous
+                                searches. This helps prevent duplicate entries
+                                in your database and ensures unique data
+                                collection.
+                              </>
+                            }
+                          />
                         </div>
                       </div>
-
-                      <div className="flex items-center space-x-3 flex-shrink-0">
-                        <Checkbox
-                          id="extractNegativeReviews"
-                          checked={formData.extractNegativeReviews}
-                          onCheckedChange={handleExtractNegativeReviewsCheckboxChange}
-                        />
-                        <div className="flex items-center space-x-2">
-                          <Label
-                            htmlFor="extractNegativeReviews"
-                            className="cursor-pointer"
-                          >
-                            Extract Negative Reviews
-                          </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Enable this option to extract negative reviews (low ratings) 
-                                from businesses. This can help identify businesses with poor 
-                                customer satisfaction or service quality issues.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </div> 
-
-                      <div className="flex items-center space-x-3 flex-shrink-0">
-                        <Checkbox
-                          id="onlyWithoutWebsite"
-                          checked={formData.onlyWithoutWebsite}
-                          onCheckedChange={handleOnlyWithoutWebsiteCheckboxChange}
-                        />
-                        <div className="flex items-center space-x-2">
-                          <Label
-                            htmlFor="onlyWithoutWebsite"
-                            className="cursor-pointer"
-                          >
-                            Only Without Website
-                          </Label>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Enable this option to filter and extract only businesses
-                                that do not have a website listed. This helps you find
-                                businesses that may need web presence services or have
-                                limited online visibility.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </div>
-
                     </div>
 
                     {/* Action Buttons */}
@@ -986,10 +1051,10 @@ export const Extraction: React.FC = () => {
                               scrapeStatus === "scraping"
                                 ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                                 : scrapeStatus === "completed"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                : scrapeStatus === "failed"
-                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                  : scrapeStatus === "failed"
+                                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                    : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
                             }`}
                           >
                             {scrapeStatus === "scraping" &&
@@ -1092,7 +1157,7 @@ export const Extraction: React.FC = () => {
           },
         ]}
       />
-    </TooltipProvider>
+    </>
   );
 };
 
