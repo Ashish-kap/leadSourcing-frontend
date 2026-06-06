@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2, Lock, RotateCcw } from "lucide-react";
 import { trackEvent } from "@/service/analytics";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
@@ -39,11 +39,15 @@ interface LocationState {
   city: string;
 }
 
+const ADVANCED_FILTERS_DISABLED_MESSAGE = "Available on paid plans.";
+
 export const Extraction: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showExtractionGuideDialog, setShowExtractionGuideDialog] =
     useState(false);
   const { data: userData } = useGetCurrentUserQuery();
+  const isFreePlan = userData?.user.plan === "free";
+  const canUseAdvancedFilters = !isFreePlan;
   const maintenance = useMaintenanceStatus();
   const {
     startScraping,
@@ -83,6 +87,33 @@ export const Extraction: React.FC = () => {
     extractNegativeReviews: false,
     onlyWithoutWebsite: false,
   });
+
+  useEffect(() => {
+    if (!isFreePlan) return;
+
+    setFormData((prev) => {
+      if (
+        prev.reviewTimeRange === null &&
+        prev.ratingFilter.value === null &&
+        prev.reviewFilter.value === null
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        reviewTimeRange: null,
+        ratingFilter: {
+          ...prev.ratingFilter,
+          value: null,
+        },
+        reviewFilter: {
+          ...prev.reviewFilter,
+          value: null,
+        },
+      };
+    });
+  }, [isFreePlan]);
 
   const [location, setLocation] = useState<LocationState>({
     countryCode: "",
@@ -158,6 +189,26 @@ export const Extraction: React.FC = () => {
       city,
     }));
   };
+
+  const getAdvancedFilterHelpContent = (content: React.ReactNode) => (
+    <>
+      {content}
+      {isFreePlan && (
+        <span className="mt-2 block text-yellow-600">
+          {ADVANCED_FILTERS_DISABLED_MESSAGE}
+        </span>
+      )}
+    </>
+  );
+  const advancedFilterLabelClassName = isFreePlan
+    ? "text-muted-foreground"
+    : undefined;
+  const renderAdvancedFilterLabel = (htmlFor: string, label: string) => (
+    <Label htmlFor={htmlFor} className={advancedFilterLabelClassName}>
+      {label}
+    </Label>
+  );
+  const advancedFilterHelpIcon = isFreePlan ? Lock : undefined;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -300,7 +351,7 @@ export const Extraction: React.FC = () => {
     }
 
     // Check plan limits for free users (fallback check)  -- tempory disable for 24hrs offer
-    if (userData?.user.plan === "free" && formData.maxRecords > 100) {
+    if (isFreePlan && formData.maxRecords > 100) {
       toast.error(
         "Free plans are limited to 100 records. Please upgrade to Business plan for more extractions.",
       );
@@ -321,6 +372,7 @@ export const Extraction: React.FC = () => {
 
     // Validate reviewTimeRange if provided
     if (
+      canUseAdvancedFilters &&
       formData.reviewTimeRange !== null &&
       (formData.reviewTimeRange < 0 || formData.reviewTimeRange > 10)
     ) {
@@ -338,27 +390,33 @@ export const Extraction: React.FC = () => {
     //   return;
     // }
 
+    const reviewTimeRange = canUseAdvancedFilters
+      ? formData.reviewTimeRange
+      : null;
+    const ratingFilter =
+      canUseAdvancedFilters && formData.ratingFilter.value !== null
+        ? {
+            operator: formData.ratingFilter.operator,
+            value: formData.ratingFilter.value,
+          }
+        : undefined;
+    const reviewFilter =
+      canUseAdvancedFilters && formData.reviewFilter.value !== null
+        ? {
+            operator: formData.reviewFilter.operator,
+            value: formData.reviewFilter.value,
+          }
+        : undefined;
+
     const fullRequest: scrapeJobPostRequest = {
       keyword: formData.keyword.trim(),
       countryCode: location.countryCode,
       stateCode: location.stateCode,
       city: location.city,
       maxRecords: formData.maxRecords,
-      reviewTimeRange: formData.reviewTimeRange,
-      ratingFilter:
-        formData.ratingFilter.value !== null
-          ? {
-              operator: formData.ratingFilter.operator,
-              value: formData.ratingFilter.value,
-            }
-          : undefined,
-      reviewFilter:
-        formData.reviewFilter.value !== null
-          ? {
-              operator: formData.reviewFilter.operator,
-              value: formData.reviewFilter.value,
-            }
-          : undefined,
+      reviewTimeRange,
+      ratingFilter,
+      reviewFilter,
       reviewsWithinLastYears: formData.reviewsWithinLastYears,
       isExtractEmail: formData.isExtractEmail,
       isValidate: formData.isValidate,
@@ -634,18 +692,20 @@ export const Extraction: React.FC = () => {
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="reviewTimeRange">
-                            Reviews Within Last (years)
-                          </Label>
+                          {renderAdvancedFilterLabel(
+                            "reviewTimeRange",
+                            "Reviews Within Last (years)",
+                          )}
                           <HelpTooltip
+                            icon={advancedFilterHelpIcon}
                             label="Reviews Within Last"
-                            content={
+                            content={getAdvancedFilterHelpContent(
                               <>
                                 Optional: Only include businesses with reviews
                                 posted within the last X years (0-10). Leave
                                 empty for all reviews.
-                              </>
-                            }
+                              </>,
+                            )}
                           />
                         </div>
                         <Input
@@ -657,29 +717,35 @@ export const Extraction: React.FC = () => {
                           min="0"
                           max="10"
                           placeholder="eg. 5"
+                          disabled={isFreePlan}
                         />
                       </div>
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="ratingOperator">Rating Filter</Label>
+                          {renderAdvancedFilterLabel(
+                            "ratingOperator",
+                            "Rating Filter",
+                          )}
                           <HelpTooltip
+                            icon={advancedFilterHelpIcon}
                             label="Rating Filter"
-                            content={
+                            content={getAdvancedFilterHelpContent(
                               <>
                                 Optional: Filter businesses by their average
                                 rating (1-5 stars). Choose operator and value
                                 (e.g., "≥ 4.0" for 4+ stars).
-                              </>
-                            }
+                              </>,
+                            )}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <Select
                             value={formData.ratingFilter.operator}
                             onValueChange={handleRatingOperatorChange}
+                            disabled={isFreePlan}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger disabled={isFreePlan}>
                               <SelectValue placeholder="Operator" />
                             </SelectTrigger>
                             <SelectContent>
@@ -707,32 +773,36 @@ export const Extraction: React.FC = () => {
                             max="5"
                             step="0.1"
                             placeholder="eg. 4.5"
+                            disabled={isFreePlan}
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor="reviewOperator">
-                            Review Count Filter
-                          </Label>
+                          {renderAdvancedFilterLabel(
+                            "reviewOperator",
+                            "Review Count Filter",
+                          )}
                           <HelpTooltip
+                            icon={advancedFilterHelpIcon}
                             label="Review Count Filter"
-                            content={
+                            content={getAdvancedFilterHelpContent(
                               <>
                                 Optional: Filter businesses by their total
                                 number of reviews. Choose operator and value
                                 (e.g., "≥ 50" for businesses with 50+ reviews).
-                              </>
-                            }
+                              </>,
+                            )}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <Select
                             value={formData.reviewFilter.operator}
                             onValueChange={handleReviewOperatorChange}
+                            disabled={isFreePlan}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger disabled={isFreePlan}>
                               <SelectValue placeholder="Operator" />
                             </SelectTrigger>
                             <SelectContent>
@@ -759,6 +829,7 @@ export const Extraction: React.FC = () => {
                             min="0"
                             step="1"
                             placeholder="eg. 100"
+                            disabled={isFreePlan}
                           />
                         </div>
                       </div>

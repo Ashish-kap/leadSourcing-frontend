@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 interface HelpTooltipProps {
   content: React.ReactNode;
+  icon?: React.ComponentType<{ className?: string }>;
   label: string;
   side?: React.ComponentPropsWithoutRef<typeof TooltipContent>["side"];
   align?: React.ComponentPropsWithoutRef<typeof TooltipContent>["align"];
@@ -34,6 +35,7 @@ function supportsDesktopPointer() {
 
 export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   content,
+  icon: Icon = HelpCircle,
   label,
   side,
   align,
@@ -70,7 +72,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
         "size-5 cursor-pointer rounded-full text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60"
       )}
     >
-      <HelpCircle className="size-4" />
+      <Icon className="size-4" />
     </button>
   );
 
