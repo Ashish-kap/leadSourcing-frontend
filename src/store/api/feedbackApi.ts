@@ -15,7 +15,7 @@ export const feedbackApi = apiSlice.injectEndpoints({
       // No need to invalidate any tags since feedback is not cached
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const { useSubmitFeedbackMutation } = feedbackApi;

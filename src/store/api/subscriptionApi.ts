@@ -32,7 +32,7 @@ export const subscriptionApi = apiSlice.injectEndpoints({
       },
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const { useCancelSubscriptionMutation } = subscriptionApi;

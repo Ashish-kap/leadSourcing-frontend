@@ -12,6 +12,8 @@ import {
   ChevronLeft,
   MapPin,
   Users,
+  Target,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,7 +28,9 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: Plus, label: "New Extraction", href: "/extraction" },
+  { icon: Search, label: "Find Leads", href: "/find-leads" },
+  { icon: Target, label: "Leads", href: "/leads" },
+  { icon: Plus, label: "Google Map Scraper", href: "/extraction" },
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   { icon: CreditCard, label: "Subscription", href: "/subscription" },
@@ -52,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       className={cn(
         "h-screen bg-gradient-card border-r border-border transition-all duration-300 ease-smooth relative overflow-hidden",
         "hidden md:block",
-        isCollapsed ? "w-16" : "w-64"
+        isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* Header */}
@@ -62,9 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             {/* <div className="w-8 h-8 bg-black/30 rounded-lg flex items-center justify-center">
               <MapPin className="w-5 h-5 text-primary-foreground" />
             </div> */}
-            <div
-              className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
-            >
+            <div className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
               <MapPin className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -81,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
           <ChevronLeft
             className={cn(
               "h-4 w-4 transition-transform duration-200",
-              isCollapsed && "rotate-180"
+              isCollapsed && "rotate-180",
             )}
           />
         </Button>
@@ -94,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             // Show Subscription only for free plan users
             if (item.href === "/subscription") {
               // return user?.user?.plan === "free";
-              return true
+              return true;
             }
             return true;
           })
@@ -107,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
                   "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                   "hover:bg-accent hover:text-accent-foreground",
                   isActive && "bg-primary text-primary-foreground shadow-glow",
-                  isCollapsed && "justify-center"
+                  isCollapsed && "justify-center",
                 )
               }
             >
@@ -119,17 +121,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
           ))}
       </nav>
 
-      
-
       {/* Logout */}
       <div className="absolute bottom-4 left-2 right-2">
         {/* Affiliate Program Card */}
-      {!isCollapsed && <AffiliateCard />}
+        {!isCollapsed && <AffiliateCard />}
         <Button
           variant="ghost"
           className={cn(
             "w-full justify-start text-destructive bg-destructive/10 hover:bg-accent hover:text-accent-foreground cursor-pointer",
-            isCollapsed && "justify-center px-3"
+            isCollapsed && "justify-center px-3",
           )}
           onClick={handleSubmit}
           disabled={isLoggingOut}
