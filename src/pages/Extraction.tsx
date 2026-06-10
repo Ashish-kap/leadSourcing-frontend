@@ -557,9 +557,8 @@ export const Extraction: React.FC = () => {
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span>Dashboard</span>
                 <span>/</span>
-                <span className="text-foreground">New Extraction</span>
+                <span className="text-foreground">Google Map Scraper</span>
               </div>
-
               <Card>
                 <CardHeader>
                   <CardTitle className="text-2xl">

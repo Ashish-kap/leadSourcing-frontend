@@ -50,14 +50,14 @@ export const Dashboard: React.FC = () => {
     // },
     {
       title: "Credits Remaining",
-      value: 
-      // userData?.user.credits.remaining.toString() || "0",
-      userData?.user.plan === "business"
-        ? "∞"
-        : userData?.user.credits.remaining.toString() || "0",
-      change: userData?.user.plan === "business"
-        ? ""
-        : `${userData?.user.creditPercentage || "0"}% remaining`,
+      value: userData?.user.credits.remaining.toString() || "0",
+      // userData?.user.plan === "business"
+      //   ? "∞"
+      //   : userData?.user.credits.remaining.toString() || "0",
+      change:
+        userData?.user.plan === "business"
+          ? ""
+          : `${userData?.user.creditPercentage || "0"}% remaining`,
       trend: "up" as const,
       icon: DollarSign,
       gradient: true,
@@ -132,19 +132,21 @@ export const Dashboard: React.FC = () => {
                   <div className="flex justify-between text-sm pb-4">
                     <span className="text-muted-foreground">Credits Used</span>
                     <span className="font-medium text-foreground">
-                      {userData?.user.plan === "business"   
+                      {/* {userData?.user.plan === "business"   
                         ? "-"
                         : `${userData?.user.credits.used || 0} / ${
                             userData?.user.credits.total || 0
-                          }`}
-                      {/* {userData?.user.credits.used || 0} /{" "}
-                      {userData?.user.credits.total || 0} */}
+                          }`} */}
+                      {userData?.user.credits.used || 0} /{" "}
+                      {userData?.user.credits.total || 0}
                     </span>
                   </div>
                   {userData?.user.plan !== "business" && (
                     <>
-                     <Progress
-                        value={parseFloat(userData?.user.creditPercentage || "0")}
+                      <Progress
+                        value={parseFloat(
+                          userData?.user.creditPercentage || "0",
+                        )}
                         className="h-2"
                       />
                     </>

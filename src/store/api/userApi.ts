@@ -19,7 +19,7 @@ export const userApi = apiSlice.injectEndpoints({
       invalidatesTags: ["User"],
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const { useUpdateProfileMutation } = userApi;

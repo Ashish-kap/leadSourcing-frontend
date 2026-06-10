@@ -14,7 +14,7 @@ export const affiliateApi = apiSlice.injectEndpoints({
       providesTags: ["User"], // Use User tag since affiliate data is user-related
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const { useGetAffiliateDataQuery } = affiliateApi;

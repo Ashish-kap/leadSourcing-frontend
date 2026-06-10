@@ -137,6 +137,7 @@ export const authApi = apiSlice.injectEndpoints({
       providesTags: ["Auth"],
     }),
   }),
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const {

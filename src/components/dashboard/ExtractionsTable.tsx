@@ -58,7 +58,7 @@ import {
 } from "@/store/api/scrapeJobApi";
 import { useGetCurrentUserQuery } from "@/store/api/authApi";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Gauge } from "lucide-react";
 import { toast } from "sonner";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { Country, State } from "country-state-city";
@@ -189,6 +189,7 @@ export const ExtractionsTable: React.FC = () => {
     status: statusFilter === "all" ? undefined : statusFilter,
     keyword: query || undefined,
     sort,
+    v2Flow: false, // v1 dashboard shows only v1 scrapes; v2 lives in Find Leads
   });
 
   const { refetch: refetchUser } = useGetCurrentUserQuery();
@@ -654,23 +655,34 @@ export const ExtractionsTable: React.FC = () => {
               </Select>
             </div>
 
-            {/* RIGHT: Button */}
-            <Button
-              onClick={() => navigate("/extraction")}
-              disabled={maintenance.isActive}
-              title={
-                maintenance.isActive
-                  ? "New extractions are temporarily paused during maintenance."
-                  : undefined
-              }
-              className="whitespace-nowrap cursor-pointer bg-primary/90 text-primary-foreground shadow-glow"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">
-                New Google Maps Extraction
-              </span>
-              <span className="sm:hidden">New Extraction</span>
-            </Button>
+            {/* RIGHT: Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/extraction")}
+                disabled={maintenance.isActive}
+                title={
+                  maintenance.isActive
+                    ? "New extractions are temporarily paused during maintenance."
+                    : undefined
+                }
+                className="whitespace-nowrap cursor-pointer"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">
+                  New Google Maps Extraction
+                </span>
+                <span className="sm:hidden">New Extraction</span>
+              </Button>
+              <Button
+                onClick={() => navigate("/find-leads")}
+                className="whitespace-nowrap cursor-pointer bg-primary/90 text-primary-foreground shadow-glow"
+              >
+                <Gauge className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Find &amp; Audit Leads</span>
+                <span className="sm:hidden">Find Leads</span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

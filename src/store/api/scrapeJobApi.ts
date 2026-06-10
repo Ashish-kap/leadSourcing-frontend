@@ -40,6 +40,8 @@ export const authApi = apiSlice.injectEndpoints({
             queryParams.append("sortBy", params.sortBy);
             queryParams.append("order", order);
           }
+          if (params.v2Flow !== undefined)
+            queryParams.append("v2Flow", String(params.v2Flow));
         }
         
         const queryString = queryParams.toString();
@@ -76,7 +78,7 @@ export const authApi = apiSlice.injectEndpoints({
       ],
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: import.meta.env.DEV,
 });
 
 export const {

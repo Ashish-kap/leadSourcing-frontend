@@ -22,7 +22,7 @@ import { AffiliateCard } from "@/components/affiliate/AffiliateCard";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: Plus, label: "New Extraction", href: "/extraction" },
+  { icon: Plus, label: "Google Map Scraper", href: "/extraction" },
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
   { icon: CreditCard, label: "Subscription", href: "/subscription" },
@@ -75,11 +75,9 @@ export const MobileMenu: React.FC = () => {
                 {/* <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                   <Map className="w-5 h-5 text-primary-foreground" />
                 </div> */}
-                <div
-              className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center"
-            >
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
+                <div className="w-8 cursor-pointer h-8 bg-gradient-to-r from-primary to-purple-600 rounded-lg flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-white" />
+                </div>
                 <div>
                   <h1 className="text-lg font-bold text-foreground">
                     CazaLead
@@ -117,7 +115,7 @@ export const MobileMenu: React.FC = () => {
                         "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                         "hover:bg-accent hover:text-accent-foreground",
                         isActive &&
-                          "bg-primary text-primary-foreground shadow-glow"
+                          "bg-primary text-primary-foreground shadow-glow",
                       )
                     }
                   >
@@ -127,12 +125,10 @@ export const MobileMenu: React.FC = () => {
                 ))}
             </nav>
 
-            
-
             {/* Logout */}
             <div className="absolute bottom-4 left-2 right-2">
               {/* Affiliate Program Card */}
-            <AffiliateCard />
+              <AffiliateCard />
               <Button
                 variant="ghost"
                 className="w-full justify-start text-destructive bg-destructive/10 hover:bg-accent hover:text-accent-foreground"

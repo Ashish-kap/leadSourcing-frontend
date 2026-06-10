@@ -56,6 +56,7 @@ export interface GetJobsQueryParams {
   sortBy?: string;
   order?: "asc" | "desc";
   sort?: string;
+  v2Flow?: boolean; // false → exclude v2 lead-search jobs from the v1 dashboard
 }
 
 export interface GetJobsResponse {

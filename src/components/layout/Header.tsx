@@ -9,6 +9,7 @@ import {
   Sparkles,
   BadgeCheck,
   Settings,
+  Coins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ export const Header: React.FC = () => {
   const userName = user?.user?.name || "User";
   const userEmail = user?.user?.emailID || "";
   const userInitials = getUserInitials(userName);
+  const creditsRemaining = user?.user?.credits?.remaining;
 
   const handleLogout = async () => {
     try {
@@ -98,6 +100,24 @@ export const Header: React.FC = () => {
             3
           </Badge>
         </Button> */}
+
+        {/* Credits remaining */}
+        {creditsRemaining != null && (
+          <button
+            type="button"
+            onClick={() => navigate("/subscription")}
+            title="Credits remaining"
+            className="flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm font-medium hover:bg-muted cursor-pointer"
+          >
+            <Coins className="h-4 w-4 text-primary" />
+            <span className="tabular-nums">
+              {creditsRemaining.toLocaleString()}
+            </span>
+            <span className="hidden sm:inline text-muted-foreground font-normal">
+              credits
+            </span>
+          </button>
+        )}
 
         {/* User Menu */}
         <DropdownMenu>
