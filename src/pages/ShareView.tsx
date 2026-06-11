@@ -77,7 +77,11 @@ const LeadRow: React.FC<{ lead: PublicLead }> = ({ lead }) => {
   return (
     <TableRow className={masked ? "bg-muted/30" : ""}>
       <TableCell className={cn("font-medium", blur)}>
-        {lead.businessName}
+        {/* Cap the name so a long, keyword-stuffed listing can't widen the
+            column and push Score/Issues off the right edge. */}
+        <div className="max-w-[260px] truncate" title={lead.businessName}>
+          {lead.businessName}
+        </div>
         {lead.city && (
           <span className="block text-xs text-muted-foreground">
             {lead.city}
@@ -100,7 +104,9 @@ const LeadRow: React.FC<{ lead: PublicLead }> = ({ lead }) => {
       </TableCell>
       <TableCell className={blur}>
         {lead.website ? (
-          <span className="text-sm">{lead.website}</span>
+          <span className="block max-w-[180px] truncate text-sm">
+            {lead.website}
+          </span>
         ) : (
           <span className="text-muted-foreground">—</span>
         )}
@@ -195,6 +201,21 @@ const ShareView: React.FC = () => {
                 &amp; website-audited by CazaLead. The lowest-scoring websites
                 are the businesses that need your services most — the issues
                 column is your sales pitch.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Speed scores come from Google's own mobile test (Lighthouse —
+                the engine behind PageSpeed Insights), so a site can feel fast
+                on your desktop and still score poorly here. Verify any result
+                yourself at{" "}
+                <a
+                  href="https://pagespeed.web.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-foreground"
+                >
+                  pagespeed.web.dev
+                </a>
+                .
               </p>
             </div>
 

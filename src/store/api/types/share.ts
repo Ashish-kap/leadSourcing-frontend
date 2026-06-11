@@ -36,4 +36,6 @@ export interface GetPublicShareResponse {
 export interface CreateShareResponse {
   status: string;
   shareId: string;
+  /** Creator's referral code, appended to the copied link as ?ref=. */
+  refCode?: string;
 }

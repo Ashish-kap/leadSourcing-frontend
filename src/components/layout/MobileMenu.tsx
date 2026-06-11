@@ -13,6 +13,8 @@ import {
   X,
   MapPin,
   Users,
+  Search,
+  Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,8 @@ import { AffiliateCard } from "@/components/affiliate/AffiliateCard";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: Search, label: "Find Leads", href: "/find-leads" },
+  { icon: Target, label: "Leads", href: "/leads" },
   { icon: Plus, label: "Google Map Scraper", href: "/extraction" },
   // { icon: Clock, label: "Extraction History", href: "/history" },
   // { icon: Bookmark, label: "Saved Searches", href: "/saved" },
