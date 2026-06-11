@@ -60,7 +60,7 @@ export const SearchesTable: React.FC = () => {
     try {
       const res = await createShare(jobId).unwrap();
       await navigator.clipboard.writeText(
-        `${window.location.origin}/share/${res.shareId}`,
+        `${window.location.origin}/share/${res.shareId}${res.refCode ? `?ref=${res.refCode}` : ""}`,
       );
       toast.success("Public link copied — anyone can view it without login.");
     } catch {

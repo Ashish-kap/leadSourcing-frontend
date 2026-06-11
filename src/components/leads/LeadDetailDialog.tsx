@@ -45,6 +45,9 @@ export const LeadDetailDialog: React.FC<LeadDetailDialogProps> = ({
 }) => {
   const { data, isFetching } = useGetLeadQuery(leadId as string, {
     skip: !open || !leadId,
+    // Revalidate on open so server-derived talking points reflect the latest
+    // audit (in-place socket patches update issues but not the snippets blob).
+    refetchOnMountOrArgChange: true,
   });
   const [reaudit, { isLoading: isReauditing }] = useReauditLeadMutation();
   const { download, isDownloading } = useDownloadAuditPdf();
@@ -75,14 +78,21 @@ export const LeadDetailDialog: React.FC<LeadDetailDialogProps> = ({
             </div>
           ) : lead ? (
             <>
-              <DialogHeader>
+              <DialogHeader className="min-w-0">
                 <DialogTitle className="flex items-center justify-between gap-4 pr-6">
-                  <span className="truncate">{lead.businessName}</span>
+                  {/* min-w-0 lets the flex child shrink so truncate can work;
+                      without it the long name blows the row out of the dialog. */}
+                  <span
+                    className="min-w-0 flex-1 truncate text-left"
+                    title={lead.businessName}
+                  >
+                    {lead.businessName}
+                  </span>
                   <ScoreBadge score={lead.audit?.score} />
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-5">
+              <div className="min-w-0 space-y-5">
                 {/* Meta */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                   {(lead.city || lead.state) && (
@@ -96,10 +106,12 @@ export const LeadDetailDialog: React.FC<LeadDetailDialogProps> = ({
                       href={lead.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-primary hover:underline"
+                      className="inline-flex min-w-0 max-w-full items-center gap-1 text-primary hover:underline"
                     >
-                      {lead.website.replace(/^https?:\/\//, "")}
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span className="truncate">
+                        {lead.website.replace(/^https?:\/\//, "")}
+                      </span>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                     </a>
                   )}
                   {lead.audit?.niche && (
@@ -131,7 +143,10 @@ export const LeadDetailDialog: React.FC<LeadDetailDialogProps> = ({
                     <h4 className="mb-2 text-sm font-semibold">Outreach talking points</h4>
                     <ul className="space-y-1.5">
                       {snippets.map((s, i) => (
-                        <li key={`${s.code}-${i}`} className="text-sm text-muted-foreground">
+                        <li
+                          key={`${s.code}-${i}`}
+                          className="text-sm text-muted-foreground break-words"
+                        >
                           • {s.text}
                         </li>
                       ))}

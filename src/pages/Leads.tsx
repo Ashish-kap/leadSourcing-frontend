@@ -252,6 +252,19 @@ const Leads: React.FC = () => {
         if (draft.data) Object.assign(draft.data, fields);
       }),
     );
+    // Talking points (snippets) are derived server-side from the lead's issues
+    // and aren't in the socket payload, so the in-place patch above leaves them
+    // stale. If this lead's detail dialog is open and its audit changed, refetch
+    // just that one detail query so the server rebuilds snippets — the list is
+    // untouched, so nothing re-sorts.
+    if (fields.audit && leadId === detailId) {
+      dispatch(
+        leadsApi.endpoints.getLead.initiate(leadId, {
+          forceRefetch: true,
+          subscribe: false,
+        }),
+      );
+    }
   };
 
   // Realtime: update rows in place during an audit (so they don't re-sort away);
