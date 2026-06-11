@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MapPin, Lock, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { setCookie } from "@/utils/cookies";
 import { useGetPublicShareQuery } from "@/store/api/shareApi";
 import { PublicLead } from "@/store/api/types/share";
 import { ScoreBadge } from "@/components/leads/ScoreBadge";
@@ -125,6 +126,23 @@ const ShareView: React.FC = () => {
 
   const share = data?.data;
 
+  // Attribute signups from this page to the share creator: store their
+  // referral code in the same `ref` cookie the login/signup flow reads, so
+  // both Google and email signups credit them.
+  useEffect(() => {
+    if (share?.refCode) {
+      setCookie("ref", share.refCode, 30, {
+        path: "/",
+        secure: window.location.protocol === "https:",
+        sameSite: "lax",
+      });
+    }
+  }, [share?.refCode]);
+
+  const signupHref = share?.refCode
+    ? `/signup?ref=${share.refCode}`
+    : "/signup";
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
@@ -136,7 +154,7 @@ const ShareView: React.FC = () => {
             <span className="text-xl font-bold gradient-text">CazaLead</span>
           </div>
           <Button asChild>
-            <Link to="/signup">Sign up free</Link>
+            <Link to={signupHref}>Sign up free</Link>
           </Button>
         </div>
       </header>
@@ -154,7 +172,7 @@ const ShareView: React.FC = () => {
               This link is no longer available.
             </p>
             <Button asChild>
-              <Link to="/signup">
+              <Link to={signupHref}>
                 Get your own leads <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -234,7 +252,7 @@ const ShareView: React.FC = () => {
                   writes itself. Free plan, no card required.
                 </p>
                 <Button size="lg" asChild>
-                  <Link to="/signup">
+                  <Link to={signupHref}>
                     Sign up free <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
