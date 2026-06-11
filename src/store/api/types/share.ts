@@ -24,6 +24,8 @@ export interface PublicShareData {
   visible: PublicLead[];
   teaser: PublicLead[];
   remainingCount: number;
+  /** Share creator's referral code — signups from this page attribute to them. */
+  refCode?: string;
 }
 
 export interface GetPublicShareResponse {
