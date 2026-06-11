@@ -60,7 +60,9 @@ export const useAuth = () => {
         password,
         passwordConfirm,
       }).unwrap();
-      navigate("/", { replace: true });
+      // Signup doesn't log the user in (email verification required), so go
+      // straight to login instead of bouncing off the protected home route.
+      navigate("/login", { replace: true });
       return result;
     } catch (error: any) {
       handleApiError(error);

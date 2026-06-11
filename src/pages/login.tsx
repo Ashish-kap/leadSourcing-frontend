@@ -239,7 +239,12 @@ const Login = () => {
               <p className="text-center text-sm text-slate-500">
                 Do not have an account?{" "}
                 <Link
-                  to="/signup"
+                  // Keep ?ref= (and any UTM params) when switching to signup.
+                  to={
+                    searchParams.toString()
+                      ? `/signup?${searchParams.toString()}`
+                      : "/signup"
+                  }
                   className="text-indigo-500 hover:text-indigo-600 font-medium transition-colors"
                 >
                   Sign up here

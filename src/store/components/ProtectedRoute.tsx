@@ -1,17 +1,20 @@
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { FeedbackFloatingButton } from "@/components/feedback/FeedbackFloatingButton";
 
 export const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate("/login", { replace: true });
+      // Keep the query string so referral/UTM params (e.g. /?ref=CODE)
+      // survive the redirect and the login page can capture them.
+      navigate(`/login${location.search}`, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, location.search]);
 
   if (isLoading) {
     return (

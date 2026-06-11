@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,11 +28,13 @@ import {
   initializeGoogleAuth,
   signInWithGooglePopup,
 } from "@/utils/googleAuth";
+import { setCookie } from "@/utils/cookies";
 import "../login.css";
 
 const Signup = () => {
   const { signup, googleAuth, isSigningUp, isGoogleLoggingIn } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -42,6 +44,20 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  // Capture and store referral code from query parameter
+  useEffect(() => {
+    const refCode = searchParams.get("ref");
+    if (refCode) {
+      // Store ref code in cookie for 30 days
+      // Set secure and sameSite for production compatibility
+      setCookie("ref", refCode, 30, {
+        path: "/",
+        secure: window.location.protocol === "https:",
+        sameSite: "lax",
+      });
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Initialize Google Auth when component mounts
@@ -93,7 +109,10 @@ const Signup = () => {
         formData.password,
         formData.confirmPassword
       );
-      toast.success("Account created successfully!");
+      toast.success(
+        "Account created successfully! We've sent a verification link to your email — please verify it before logging in.",
+        { duration: 8000 }
+      );
     } catch {
       // API error toasts are handled centrally via useAuth -> handleApiError.
     }
@@ -431,7 +450,12 @@ const Signup = () => {
               <p className="text-center text-sm text-slate-500 mt-6">
                 Already have an account?{" "}
                 <Link
-                  to="/login"
+                  // Keep ?ref= (and any UTM params) when switching to login.
+                  to={
+                    searchParams.toString()
+                      ? `/login?${searchParams.toString()}`
+                      : "/login"
+                  }
                   className="text-indigo-500 hover:text-indigo-600 font-medium transition-colors"
                 >
                   Sign in here
