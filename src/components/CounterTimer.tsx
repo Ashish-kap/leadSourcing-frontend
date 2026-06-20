@@ -179,20 +179,20 @@ export const CountdownTimer: React.FC = () => {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1.5">
               {currentOffer ? (
-                <div className="text-[14px] font-semibold text-primary  leading-tight">
+                <div className="text-[12px] font-semibold text-primary  leading-tight">
                   {currentOffer}
                 </div>
               ) : null}
             </div>
-            <div className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
+            {/* <div className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
               Deal Ends In
-            </div>
+            </div> */}
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded px-2 py-1 min-w-[3rem] border border-primary/10">
-            <span className="text-lg font-bold text-foreground tabular-nums leading-none">
+          <div className="flex flex-col items-center bg-gradient-to-br from-primary/15 to-primary/5 rounded px-2 py-1 min-w-[2.5rem] border border-primary/10">
+            <span className="text-base font-bold text-foreground tabular-nums leading-none">
               {formatNumber(timeLeft.hours)}
             </span>
             <span className="text-[8px] text-muted-foreground uppercase leading-none mt-0.5">
