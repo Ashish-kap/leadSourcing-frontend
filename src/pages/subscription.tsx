@@ -31,7 +31,9 @@ const Subscription: React.FC = () => {
 
       // Get actual product ID based on plan name
       let actualProductId = "";
-      if (selectedProductId === "pro") {
+      if (selectedProductId === "starter") {
+        actualProductId = import.meta.env.VITE_PLAN_STARTER;
+      } else if (selectedProductId === "pro") {
         actualProductId = import.meta.env.VITE_PLAN_PRO;
       } else if (selectedProductId === "business") {
         actualProductId = import.meta.env.VITE_PLAN_BUSINESS;
@@ -75,7 +77,7 @@ const Subscription: React.FC = () => {
 
       // You can add success notification here
       toast.success("Redirecting to payment...");
-    } catch (error) {
+    } catch {
       // Payment processing failed
       // You can add error notification here
       toast.error("Payment processing failed. Please try again.");
@@ -90,14 +92,31 @@ const Subscription: React.FC = () => {
 
   const pricingPlans: PricingPlan[] = [
     {
+      name: "Starter",
+      price: "$9",
+      period: "/month",
+      description: "Best for freelancers getting started",
+      features: [
+        "1,000 leads / month",
+        "Complete business profiles",
+        "White-label PDF audit reports",
+        "All export formats",
+        "Priority support",
+        "Advanced filtering",
+      ],
+      productId: "starter",
+      popular: true,
+    },
+    {
       name: "Pro",
       price: "$59",
       oldPrice: "$99",
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "10000 contacts / month",
+        "10,000 leads / month",
         "Complete business profiles",
+        "White-label PDF audit reports",
         "All export formats",
         "Priority support",
         "Advanced filtering",
@@ -112,8 +131,9 @@ const Subscription: React.FC = () => {
       period: "/month",
       description: "Best for growing businesses and agencies",
       features: [
-        "Unlimited contacts",
+        "100,000 leads / month",
         "Complete business profiles",
+        "White-label PDF audit reports",
         "All export formats",
         "Priority support",
         "Advanced filtering",
@@ -145,7 +165,7 @@ const Subscription: React.FC = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 {pricingPlans.map((plan, index) => (
                   <PricingCard
                     key={index}

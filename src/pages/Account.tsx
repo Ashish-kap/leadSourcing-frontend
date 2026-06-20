@@ -25,6 +25,7 @@ const Account = () => {
     const planMap: Record<string, string> = {
       business: "Business",
       pro: "Pro",
+      starter: "Starter",
       professional: "Professional",
       premium: "Premium",
       free: "Free",
@@ -37,6 +38,7 @@ const Account = () => {
     const priceMap: Record<string, string> = {
       business: "$149.00",
       pro: "$59.00",
+      starter: "$9.00",
       professional: "$59.00", // in case you have both pro and professional
       premium: "$149.00", // in case you have premium as business
       free: "$0.00",
