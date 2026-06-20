@@ -94,6 +94,7 @@ const Subscription: React.FC = () => {
     {
       name: "Starter",
       price: "$9",
+      oldPrice: "$19",
       period: "/month",
       description: "Best for freelancers getting started",
       features: [
